@@ -1,19 +1,47 @@
+import { useEffect, useState } from "react";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import { Link, useParams } from "react-router-dom";
-import { mockUserJourneys } from "@/mockdata/mockJourneys";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Layer } from "@/components/journey/layer";
+import { fetchJourneyById } from "@/api/journeys";
+import { type Journey } from "@/types/journey";
 
 export default function JourneyView() {
   let { journeyId } = useParams();
+  const [journey, setJourney] = useState<Journey | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const journey = mockUserJourneys.find((j) => j.id === journeyId);
-  if (!journey) {
+  useEffect(() => {
+    async function getJourney() {
+      if (!journeyId) {
+        setError(true);
+        setLoading(false);
+        return;
+      }
+      try {
+        const data = await fetchJourneyById(journeyId);
+        setJourney(data);
+      } catch (error) {
+        console.error(error);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getJourney();
+  }, [journeyId]);
+
+  if (loading) {
+    return <div>Loading journey...</div>;
+  }
+
+  if (error || !journey) {
     return (
       <Empty>
-        <EmptyTitle>Journey not found</EmptyTitle>
+        <EmptyTitle>Failed to fetch journey</EmptyTitle>
       </Empty>
     );
   }

@@ -15,7 +15,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Empty, EmptyTitle } from "./ui/empty";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -53,6 +53,8 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
     },
   });
 
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="flex items-center py-4">
@@ -78,17 +80,14 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                onClick={() => navigate(`/journey/${row.original.id}`)}
+                className="cursor-pointer"
               >
-                <Link to={`/journey/${row.original.id}`} className="contents">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </Link>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
             ))
           ) : (
