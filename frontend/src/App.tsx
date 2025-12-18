@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './global.css'
+import { Routes, Route } from "react-router-dom";
+import SideNavigationLayout from "./components/layouts/SideNavigationLayout";
+import { SidebarProvider } from "./components/ui/sidebar";
+import { Empty, EmptyTitle } from "./components/ui/empty";
+import UserJourneys from "./pages/UserJourneys";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <SidebarProvider>
+      <Routes>
+        <Route element={<SideNavigationLayout />}>
+          <Route path="/" element={<UserJourneys />} />
+          <Route
+            path="*"
+            element={
+              <Empty>
+                <EmptyTitle>404 Not Found</EmptyTitle>
+              </Empty>
+            }
+          />
+        </Route>
+      </Routes>
+    </SidebarProvider>
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,23 @@
+export interface Dimension {
+  id: string;
+  name: string;
+  description: string;
+  type: "Text" | "Number" | "Image";
+}
+
+export interface Step {
+  id: string;
+  name: string;
+  description: string;
+  dimensions: Dimension[];
+}
+
+export interface UserJourney {
+  id: string;
+  name: string;
+  description: string;
+  steps: Step[];
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
