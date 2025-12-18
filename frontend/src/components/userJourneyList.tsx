@@ -80,7 +80,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                onClick={() => navigate(`/journey/${row.original.id}`)}
+                onClick={() => navigate(`/journey/${row.original.id}/steps`)}
                 className="cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => (

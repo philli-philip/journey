@@ -1,6 +1,7 @@
 export interface Journey {
   id: string;
   name: string;
+  description: string;
   steps: Step[];
 }
 

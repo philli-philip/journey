@@ -28,6 +28,14 @@ bower_components/
 *.pyc
 *.class
 
+# Environment variables
+.env
+.env.test
+.env.production
+
+# Databases
+*.db
+
 # dotenv files
 .env
 .env.local

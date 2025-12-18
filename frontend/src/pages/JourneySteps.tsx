@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
-import { Link, useParams } from "react-router-dom";
-import { ArrowLeftIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useParams } from "react-router-dom";
 import { Layer } from "@/components/journey/layer";
 import { fetchJourneyById } from "@/api/journeys";
 import { type Journey } from "@/types/journey";
@@ -23,7 +20,15 @@ export default function JourneyView() {
       }
       try {
         const data = await fetchJourneyById(journeyId);
-        setJourney(data);
+        setJourney({
+          ...data,
+          steps:
+            typeof data.steps === "string"
+              ? JSON.parse(data.steps)
+              : data.steps,
+        });
+
+        console.log(journey);
       } catch (error) {
         console.error(error);
         setError(true);
@@ -72,31 +77,6 @@ export default function JourneyView() {
 
   return (
     <div className="w-full h-full">
-      <div className="flex items-center flex-row gap-1 border-b p-1 border-border w-full">
-        <Button
-          asChild
-          variant="ghost"
-          size="icon-sm"
-          className="cursor-pointer"
-        >
-          <SidebarTrigger />
-        </Button>
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/">
-            <ArrowLeftIcon size="16" className="text-secondary-foreground" />
-            <span className="text-muted-foreground">Journeys</span>
-          </Link>
-        </Button>
-        <span className="text-lg text-gray-400">/</span>
-        <span className="font-semibold text-foreground pl-2">
-          {journey.name}
-        </span>
-      </div>
-      <div data-slot="journey-header" className="p-2 border-b">
-        <h1 className="font-semibold text-xl text-foreground pl-2  pt-4">
-          {journey.name}
-        </h1>
-      </div>
       <div className="pt-4 bg-neutral-50 h-full">
         <Layer
           title={"Step"}

@@ -106,4 +106,48 @@ export const mockUserJourneys: UserJourney[] = [
     createdAt: "2023-02-15T11:30:00Z",
     updatedAt: "2023-02-15T11:30:00Z",
   },
+  {
+    id: "uj3",
+    name: "Customer Support Interaction",
+    description: "Process of a user seeking and receiving support.",
+    steps: [
+      {
+        id: "s6",
+        name: "Access Help Center",
+        description: "User navigates to the help or support section.",
+        img: "https://img.icons8.com/ios/50/000000/help.png",
+        attributes: {
+          pains: "Difficulty finding relevant articles",
+          insights: "Search functionality is crucial for self-service",
+          services: "Knowledge base service",
+        },
+      },
+      {
+        id: "s7",
+        name: "Submit Ticket",
+        description: "User submits a support request.",
+        img: "https://img.icons8.com/ios/50/000000/ticket.png",
+        attributes: {
+          pains: "Long wait times for response",
+          insights:
+            "Clear communication on expected response times improves satisfaction",
+          services: "Ticketing system",
+        },
+      },
+      {
+        id: "s8",
+        name: "Receive Resolution",
+        description: "User gets a solution to their problem.",
+        img: "https://img.icons8.com/ios/50/000000/solution.png",
+        attributes: {
+          pains: "Unresolved issues or multiple interactions",
+          insights:
+            "Follow-up surveys help gauge satisfaction and identify areas for improvement",
+          services: "Customer support agent, CRM",
+        },
+      },
+    ],
+    createdAt: "2023-03-20T09:00:00Z",
+    updatedAt: "2023-03-20T09:00:00Z",
+  },
 ];

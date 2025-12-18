@@ -17,3 +17,20 @@ export async function fetchJourneyById(id: string) {
   const data = await response.json();
   return data;
 }
+
+export async function updateJourney(
+  id: string,
+  updates: { name?: string; description?: string }
+) {
+  const response = await fetch(`${API_BASE_URL}/journeys/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updates),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to update journey with id ${id}`);
+  }
+  return response.json();
+}
