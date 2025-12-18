@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { columns } from "@/components/user-journeys-columns";
-import UserJourneyList from "@/components/UserJourneyList";
-import { mockUserJourneys } from "@/mockData";
+import UserJourneyList from "@/components/userJourneyList";
+import { mockUserJourneys } from "@/mockdata/mockJourneys";
 
 export default function UserJourneys() {
   return (

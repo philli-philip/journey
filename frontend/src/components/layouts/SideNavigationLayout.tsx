@@ -19,7 +19,7 @@ export default function SideNavigationLayout() {
     { id: "uj2", name: "Teams", path: "/teams" },
   ];
   return (
-    <div className="flex min-h-screen w-screen">
+    <div className="flex min-h-screen w-screen bg-background">
       <Sidebar>
         <SidebarContent>
           <SidebarHeader>

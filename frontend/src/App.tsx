@@ -2,7 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import SideNavigationLayout from "./components/layouts/SideNavigationLayout";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { Empty, EmptyTitle } from "./components/ui/empty";
-import UserJourneys from "./pages/UserJourneys";
+import UserJourneys from "./pages/UserJourneys.tsx";
+import JourneyView from "./pages/JourneyView.tsx";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Routes>
         <Route element={<SideNavigationLayout />}>
           <Route path="/" element={<UserJourneys />} />
+          <Route path="/journey/:journeyId" element={<JourneyView />} />
           <Route
             path="*"
             element={

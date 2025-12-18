@@ -17,6 +17,10 @@ export const columns: ColumnDef<UserJourney>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const journey = row.original;
+      return <div className="font-semibold">{journey.name}</div>;
+    },
   },
   {
     accessorKey: "description",
@@ -46,7 +50,7 @@ export const columns: ColumnDef<UserJourney>[] = [
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdAt"));
       const formattedDate = date.toLocaleDateString();
-      return <div className="font-medium">{formattedDate}</div>;
+      return <div className="text-secondary-foreground">{formattedDate}</div>;
     },
   },
   {
@@ -65,7 +69,7 @@ export const columns: ColumnDef<UserJourney>[] = [
     cell: ({ row }) => {
       const date = new Date(row.getValue("updatedAt"));
       const formattedDate = date.toLocaleDateString();
-      return <div className="font-medium">{formattedDate}</div>;
+      return <div className="text-secondary-foreground">{formattedDate}</div>;
     },
   },
 ];

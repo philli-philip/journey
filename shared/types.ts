@@ -1,5 +1,5 @@
 export interface Dimension {
-  id: string;
+  slug: string;
   name: string;
   description: string;
   type: "Text" | "Number" | "Image";
@@ -9,7 +9,8 @@ export interface Step {
   id: string;
   name: string;
   description: string;
-  dimensions: Dimension[];
+  img: string;
+  attributes: Record<Dimension["slug"], string>;
 }
 
 export interface UserJourney {
