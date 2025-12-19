@@ -13,9 +13,9 @@ export default function JourneyOverview() {
     );
   }
 
-  const journey = useJourney(journeyId);
+  const { journey, loading, error } = useJourney(journeyId as string);
 
-  if (journey.loading) {
+  if (loading) {
     return (
       <Empty>
         <EmptyTitle>Loading...</EmptyTitle>
@@ -23,7 +23,7 @@ export default function JourneyOverview() {
     );
   }
 
-  if (journey.error || !journey.journey) {
+  if (error || !journey) {
     return (
       <Empty>
         <EmptyTitle>404 Not Found</EmptyTitle>
@@ -31,7 +31,5 @@ export default function JourneyOverview() {
     );
   }
 
-  return (
-    <div className="mx-auto max-w-4xl p-4">{journey.journey.description}</div>
-  );
+  return <div className="mx-auto max-w-4xl p-4">{journey.description}</div>;
 }

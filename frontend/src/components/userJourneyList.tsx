@@ -15,7 +15,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Empty, EmptyTitle } from "./ui/empty";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -52,8 +52,6 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
       rowSelection,
     },
   });
-
-  const navigate = useNavigate();
 
   return (
     <>

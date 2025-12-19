@@ -1,61 +1,34 @@
-import { useEffect, useState } from "react";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import { useParams } from "react-router-dom";
 import { Layer } from "@/components/journey/layer";
-import { fetchJourneyById } from "@/api/journeys";
 import { type Journey } from "@/types/journey";
+import useJourney from "@/hooks/useJourney";
 
 export default function JourneyView() {
   let { journeyId } = useParams();
-  const [journey, setJourney] = useState<Journey | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    async function getJourney() {
-      if (!journeyId) {
-        setError(true);
-        setLoading(false);
-        return;
-      }
-      try {
-        const data = await fetchJourneyById(journeyId);
-        setJourney({
-          ...data,
-          steps:
-            typeof data.steps === "string"
-              ? JSON.parse(data.steps)
-              : data.steps,
-        });
-      } catch (error) {
-        console.error(error);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-    getJourney();
-  }, [journeyId]);
+  const { journey, loading, error } = useJourney(journeyId as string);
 
   if (loading) {
     return <div>Loading journey...</div>;
   }
 
-  if (error || !journey) {
+  if (error || !journey || !journey.steps) {
     return (
       <Empty>
-        <EmptyTitle>Failed to fetch journey</EmptyTitle>
+        <EmptyTitle>Failed to fetch journey or steps not found</EmptyTitle>
       </Empty>
     );
   }
 
-  const tiles = journey.steps.map((step) => step.name);
-  const descriptions = journey.steps.map((step) => step.description);
-  const images = journey.steps.map((step) => step.img);
-  const painPoints = journey.steps.map((step) => step.attributes.pains);
-  const insights = journey.steps.map((step) => step.attributes.insights);
-  const services = journey.steps.map((step) => step.attributes.services);
-  const empty = journey.steps.map(() => "");
+  const currentJourney: Journey = journey;
+
+  const tiles = currentJourney.steps.map((step) => step.name);
+  const descriptions = currentJourney.steps.map((step) => step.description);
+  const images = currentJourney.steps.map((step) => step.img);
+  const painPoints = currentJourney.steps.map((step) => step.attributes.pains);
+  const insights = currentJourney.steps.map((step) => step.attributes.insights);
+  const services = currentJourney.steps.map((step) => step.attributes.services);
+  const empty = currentJourney.steps.map(() => "");
 
   function renderTitle(title: string) {
     return (

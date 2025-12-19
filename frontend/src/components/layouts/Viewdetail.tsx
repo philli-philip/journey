@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { updateJourney } from "@/api/journeys";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const navItems = (journeyId: string) => [
   {
@@ -31,30 +32,37 @@ export default function ViewLayout() {
     );
   }
 
-  const { journey, loading, error, setJourney } = useJourney(journeyId);
+  const { journey, loading, error } = useJourney(journeyId);
+  const queryClient = useQueryClient();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(journey?.name || "");
-
-  const handleTitleUpdate = async () => {
-    if (!journeyId || !journey || editedTitle === journey.name) {
-      setIsEditingTitle(false);
-      return;
-    }
-    try {
-      await updateJourney(journeyId, { name: editedTitle });
-      setJourney({ ...journey, name: editedTitle });
-    } catch (err) {
-    } finally {
-      setIsEditingTitle(false);
-    }
-  };
+  const [editedTitle, setEditedTitle] = useState("");
 
   useEffect(() => {
     if (journey) {
       setEditedTitle(journey.name);
     }
   }, [journey]);
+
+  const updateJourneyMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: { name?: string } }) =>
+      updateJourney(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
+    },
+  });
+
+  const handleTitleUpdate = async () => {
+    if (!journeyId || !journey || editedTitle === journey.name) {
+      setIsEditingTitle(false);
+      return;
+    }
+    updateJourneyMutation.mutate({
+      id: journeyId,
+      updates: { name: editedTitle },
+    });
+    setIsEditingTitle(false);
+  };
 
   if (loading) {
     return (

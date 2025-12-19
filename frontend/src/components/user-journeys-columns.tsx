@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const columns: ColumnDef<UserJourney>[] = [
   {
@@ -84,19 +85,30 @@ export const columns: ColumnDef<UserJourney>[] = [
     header: "Actions",
     cell: ({ row }) => {
       const journey = row.original;
+      const queryClient = useQueryClient();
+
+      const deleteMutation = useMutation({
+        mutationFn: (id: string) => deleteJourney(id),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["journeys"] });
+        },
+      });
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger className="z-10">
-            <Button variant="ghost">
-              <span className="sr-only">actions</span>
-              <MoreVerticalIcon size={12} />
+            <Button variant="ghost" asChild>
+              <div>
+                <span className="sr-only">actions</span>
+                <MoreVerticalIcon size={12} />
+              </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
               onClick={async (event) => {
                 event.preventDefault();
-                await deleteJourney(journey.id);
+                deleteMutation.mutate(journey.id);
               }}
             >
               Delete

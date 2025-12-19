@@ -1,29 +1,19 @@
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { columns } from "@/components/user-journeys-columns";
 import UserJourneyList from "@/components/userJourneyList";
 import { fetchAllJourneys } from "@/api/journeys";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
+import { useQuery } from "@tanstack/react-query";
+import { type UserJourney } from "@shared/types";
 
 export default function UserJourneys() {
-  const [journeys, setJourneys] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    async function getJourneys() {
-      try {
-        const data = await fetchAllJourneys();
-        setJourneys(data);
-      } catch (error) {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+  const { data: journeys, isLoading: loading, error } = useQuery<UserJourney[]>(
+    {
+      queryKey: ["journeys"],
+      queryFn: fetchAllJourneys,
     }
-    getJourneys();
-  }, []);
+  );
 
   if (loading) {
     return <div>Loading journeys...</div>;
@@ -45,7 +35,7 @@ export default function UserJourneys() {
         </Button>
         <h1 className="font-semibold">User Journeys</h1>
       </div>
-      <UserJourneyList columns={columns} data={journeys} />
+      <UserJourneyList columns={columns} data={journeys || []} />
     </div>
   );
 }

@@ -1,37 +1,26 @@
 import { fetchJourneyById } from "@/api/journeys";
 import type { Journey } from "@/types/journey";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function useJourney(journeyId: string) {
-  const [journey, setJourney] = useState<Journey | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, isLoading, error } = useQuery<Journey, Error>({
+    queryKey: ["journey", journeyId],
+    queryFn: () => fetchJourneyById(journeyId),
+    enabled: !!journeyId,
+  });
 
-  useEffect(() => {
-    async function getJourney() {
-      if (!journeyId) {
-        setError(true);
-        setLoading(false);
-        return;
-      }
-      try {
-        const data = await fetchJourneyById(journeyId);
-        setJourney({
+  return {
+    journey: data
+      ? {
           ...data,
           steps:
             typeof data.steps === "string"
               ? JSON.parse(data.steps)
               : data.steps,
-        });
-      } catch (error) {
-        console.error(error);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-    getJourney();
-  }, [journeyId]);
-
-  return { journey, loading, error, setJourney };
+        }
+      : undefined,
+    loading: isLoading,
+    error: error ? true : false,
+    setJourney: () => {},
+  };
 }
