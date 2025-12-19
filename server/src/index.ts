@@ -1,4 +1,5 @@
 import db from "./db";
+import { randomID } from "../../shared/randomID";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 
@@ -8,7 +9,7 @@ const fastify = Fastify({
 
 fastify.register(cors, {
   origin: "http://localhost:3000", // Allow requests from your frontend origin
-  methods: ["GET", "PUT", "DELETE"], // Allow GET, PUT, and DELETE requests
+  methods: ["GET", "POST", "PUT", "DELETE"], // Allow GET, POST, PUT, and DELETE requests
 });
 
 fastify.get("/journeys", async (request, reply) => {
@@ -22,6 +23,42 @@ fastify.get("/journeys", async (request, reply) => {
           reject(err);
         }
         resolve(rows);
+      }
+    );
+  });
+});
+
+fastify.post("/journeys", async (request, reply) => {
+  const id = randomID();
+  const title = "New journey";
+  const createdAt = new Date().toISOString();
+  const updatedAt = new Date().toISOString();
+
+  return new Promise((resolve, reject) => {
+    db.run(
+      "INSERT INTO user_journeys (id, name, description, steps, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)",
+      [id, title, "", "[]", createdAt, updatedAt],
+      function (err) {
+        if (err) {
+          reply.code(500).send({ message: "Error creating journey" });
+          reject(err);
+        }
+        reply.code(201).send({
+          id,
+          name: title,
+          description: "",
+          steps: [],
+          createdAt,
+          updatedAt,
+        });
+        resolve({
+          id,
+          name: title,
+          description: "",
+          steps: [],
+          createdAt,
+          updatedAt,
+        });
       }
     );
   });

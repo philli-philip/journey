@@ -4,8 +4,8 @@ export const CREATE_USER_JOURNEYS_TABLE = `
     name TEXT NOT NULL,
     description TEXT,
     steps TEXT,
-    createdAt TEXT,
-    updatedAt TEXT,
-    deletedAt TEXT
+    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    deletedAt TEXT DEFAULT NULL
   )
 `;

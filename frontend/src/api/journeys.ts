@@ -9,6 +9,17 @@ export async function fetchAllJourneys() {
   return data;
 }
 
+export async function createJourney() {
+  const response = await fetch(`${API_BASE_URL}/journeys`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to create journey");
+  }
+  const data = await response.json();
+  return data;
+}
+
 export async function fetchJourneyById(id: string) {
   const response = await fetch(`${API_BASE_URL}/journeys/${id}`);
   if (!response.ok) {
