@@ -7,19 +7,23 @@ const fastify = Fastify({
 });
 
 fastify.register(cors, {
-  origin: "http://localhost:5174", // Allow requests from your frontend origin
+  origin: "http://localhost:3000", // Allow requests from your frontend origin
   methods: ["GET", "PUT", "DELETE"], // Allow GET, PUT, and DELETE requests
 });
 
 fastify.get("/journeys", async (request, reply) => {
   return new Promise((resolve, reject) => {
-    db.all("SELECT * FROM user_journeys", [], (err, rows) => {
-      if (err) {
-        reply.code(500).send({ message: "Error fetching journeys" });
-        reject(err);
+    db.all(
+      "SELECT * FROM user_journeys WHERE deletedAt IS NULL",
+      [],
+      (err, rows) => {
+        if (err) {
+          reply.code(500).send({ message: "Error fetching journeys" });
+          reject(err);
+        }
+        resolve(rows);
       }
-      resolve(rows);
-    });
+    );
   });
 });
 
@@ -90,18 +94,22 @@ fastify.put("/journeys/:id", async (request, reply) => {
 fastify.delete("/journeys/:id", async (request, reply) => {
   const { id } = request.params as { id: string };
   return new Promise((resolve, reject) => {
-    db.run("DELETE FROM user_journeys WHERE id = ?", [id], function (err) {
-      if (err) {
-        reply.code(500).send({ message: "Error deleting journey" });
-        reject(err);
+    db.run(
+      "UPDATE user_journeys SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?",
+      [id],
+      function (err) {
+        if (err) {
+          reply.code(500).send({ message: "Error soft-deleting journey" });
+          reject(err);
+        }
+        if (this.changes === 0) {
+          reply.code(404).send({ message: "Journey not found" });
+          resolve(null);
+        }
+        reply.code(200).send({ message: "Journey soft-deleted successfully" });
+        resolve({ message: "Journey soft-deleted successfully" });
       }
-      if (this.changes === 0) {
-        reply.code(404).send({ message: "Journey not found" });
-        resolve(null);
-      }
-      reply.code(200).send({ message: "Journey deleted successfully" });
-      resolve({ message: "Journey deleted successfully" });
-    });
+    );
   });
 });
 

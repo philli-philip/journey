@@ -11,7 +11,8 @@
     "backend:dev": "cd server && npm run start",
     "frontend:check": "cd frontend && npm run check",
     "backend:lint": "cd server && npm run lint",
-    "backend:check": "cd server && npm run check"
+    "backend:check": "cd server && npm run check",
+    "seed": "cd server && npm run seed"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
