@@ -5,10 +5,8 @@ import { ArrowLeftIcon } from "lucide-react";
 import useJourney from "@/hooks/useJourney";
 import { Empty, EmptyTitle } from "../ui/empty";
 import { useEffect, useState } from "react";
-import { updateJourney } from "@/api/journeys";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const navItems = (journeyId: string) => [
   {
@@ -32,8 +30,7 @@ export default function ViewLayout() {
     );
   }
 
-  const { journey, loading, error } = useJourney(journeyId);
-  const queryClient = useQueryClient();
+  const { journey, loading, error, updateJourney } = useJourney(journeyId);
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
@@ -44,20 +41,12 @@ export default function ViewLayout() {
     }
   }, [journey]);
 
-  const updateJourneyMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: { name?: string } }) =>
-      updateJourney(id, updates),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
-    },
-  });
-
   const handleTitleUpdate = async () => {
     if (!journeyId || !journey || editedTitle === journey.name) {
       setIsEditingTitle(false);
       return;
     }
-    updateJourneyMutation.mutate({
+    updateJourney({
       id: journeyId,
       updates: { name: editedTitle },
     });

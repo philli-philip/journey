@@ -1,19 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { columns } from "@/components/user-journeys-columns";
+import { getColumns } from "@/components/user-journeys-columns";
 import UserJourneyList from "@/components/userJourneyList";
-import { fetchAllJourneys } from "@/api/journeys";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
-import { useQuery } from "@tanstack/react-query";
-import { type UserJourney } from "@shared/types";
+import useAllJourneys from "@/hooks/useAllJourneys";
+import useJourney from "@/hooks/useJourney"; // Import useJourney to get mutations
 
 export default function UserJourneys() {
-  const { data: journeys, isLoading: loading, error } = useQuery<UserJourney[]>(
-    {
-      queryKey: ["journeys"],
-      queryFn: fetchAllJourneys,
-    }
-  );
+  const { journeys, loading, error } = useAllJourneys();
+  const { deleteJourney } = useJourney(""); // Pass an empty string or a dummy ID, as we only need the mutations here
 
   if (loading) {
     return <div>Loading journeys...</div>;
@@ -26,6 +21,8 @@ export default function UserJourneys() {
       </Empty>
     );
   }
+
+  const columns = getColumns({ deleteJourney });
 
   return (
     <div className="flex flex-col flex-1">

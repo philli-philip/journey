@@ -2,17 +2,18 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { type UserJourney } from "@shared/types";
 import { ArrowUpDown, MoreVerticalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { deleteJourney, restoreJourney } from "@/api/journeys";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
-export const columns: ColumnDef<UserJourney>[] = [
+export const getColumns = ({
+  deleteJourney,
+}: {
+  deleteJourney: (id: string) => void;
+}): ColumnDef<UserJourney>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -86,24 +87,6 @@ export const columns: ColumnDef<UserJourney>[] = [
     header: "Actions",
     cell: ({ row }) => {
       const journey = row.original;
-      const queryClient = useQueryClient();
-
-      const deleteMutation = useMutation({
-        mutationFn: (id: string) => deleteJourney(id),
-        onSuccess: (data: { id: string }) => {
-          queryClient.invalidateQueries({ queryKey: ["journeys"] });
-          toast("Journey deleted.", {
-            action: {
-              label: "Undo",
-              onClick: async () => {
-                await restoreJourney(data.id);
-                queryClient.invalidateQueries({ queryKey: ["journeys"] });
-                toast("Journey restored.");
-              },
-            },
-          });
-        },
-      });
 
       return (
         <DropdownMenu>
@@ -119,7 +102,7 @@ export const columns: ColumnDef<UserJourney>[] = [
             <DropdownMenuItem
               onClick={async (event) => {
                 event.preventDefault();
-                deleteMutation.mutate(journey.id);
+                deleteJourney(journey.id);
               }}
             >
               Delete
