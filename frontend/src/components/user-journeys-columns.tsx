@@ -91,14 +91,18 @@ export const getColumns = ({
       return (
         <DropdownMenu>
           <DropdownMenuTrigger className="z-10">
-            <Button variant="ghost" asChild>
+            <Button
+              variant="ghost"
+              asChild
+              className="border-transparent hover:border-border border cursor-pointer"
+            >
               <div>
                 <span className="sr-only">actions</span>
                 <MoreVerticalIcon size={12} />
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={async (event) => {
                 event.preventDefault();

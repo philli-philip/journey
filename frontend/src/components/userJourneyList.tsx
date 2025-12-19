@@ -82,19 +82,15 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {cell.column.id === "name" ? (
-                      <Link
-                        to={`/journey/${row.original.id}/steps`}
-                        className="text-primary"
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </Link>
-                    ) : (
-                      flexRender(cell.column.columnDef.cell, cell.getContext())
-                    )}
+                    <Link
+                      to={`/journey/${row.original.id}/steps`}
+                      className="text-primary"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </Link>
                   </TableCell>
                 ))}
               </TableRow>
