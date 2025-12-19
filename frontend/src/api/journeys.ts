@@ -32,7 +32,7 @@ export async function updateJourney(
   if (!response.ok) {
     throw new Error(`Failed to update journey with id ${id}`);
   }
-  return response.json();
+  return { id };
 }
 export async function deleteJourney(id: string) {
   const response = await fetch(`${API_BASE_URL}/journeys/${id}`, {
@@ -40,6 +40,16 @@ export async function deleteJourney(id: string) {
   });
   if (!response.ok) {
     throw new Error(`Failed to delete journey with id ${id}`);
+  }
+  return { id, message: "Journey deleted successfully" };
+}
+
+export async function restoreJourney(id: string) {
+  const response = await fetch(`${API_BASE_URL}/journeys/${id}/restore`, {
+    method: "PUT",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to restore journey with id ${id}`);
   }
   return response.json();
 }

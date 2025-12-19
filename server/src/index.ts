@@ -113,6 +113,28 @@ fastify.delete("/journeys/:id", async (request, reply) => {
   });
 });
 
+fastify.put("/journeys/:id/restore", async (request, reply) => {
+  const { id } = request.params as { id: string };
+  return new Promise((resolve, reject) => {
+    db.run(
+      "UPDATE user_journeys SET deletedAt = NULL, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
+      [id],
+      function (err) {
+        if (err) {
+          reply.code(500).send({ message: "Error restoring journey" });
+          reject(err);
+        }
+        if (this.changes === 0) {
+          reply.code(404).send({ message: "Journey not found" });
+          resolve(null);
+        }
+        reply.code(200).send({ message: "Journey restored successfully" });
+        resolve({ message: "Journey restored successfully" });
+      }
+    );
+  });
+});
+
 const start = async () => {
   try {
     console.log("Attempting to listen on port 3001");

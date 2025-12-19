@@ -7,6 +7,7 @@ import JourneyView from "./pages/JourneySteps.tsx";
 import ViewLayout from "./components/layouts/Viewdetail.tsx";
 import JourneyOverview from "./pages/JourneyOverview.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function App() {
             />
           </Route>
         </Routes>
+        <Toaster />
       </SidebarProvider>
     </QueryClientProvider>
   );

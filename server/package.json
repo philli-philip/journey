@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "rm -rf dist && tsc && node dist/server/src/index.js",
+    "start": "node dist/server/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "check": "tsc --noEmit",
