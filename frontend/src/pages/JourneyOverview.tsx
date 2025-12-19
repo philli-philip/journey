@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 export default function JourneyOverview() {
   const journeyId = useParams().journeyId;
 
+  const { journey, loading, error } = useJourney(journeyId as string);
+
   if (!journeyId) {
     return (
       <Empty>
@@ -12,8 +14,6 @@ export default function JourneyOverview() {
       </Empty>
     );
   }
-
-  const { journey, loading, error } = useJourney(journeyId as string);
 
   if (loading) {
     return (

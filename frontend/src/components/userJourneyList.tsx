@@ -34,6 +34,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  /* eslint-disable-next-line */
   const table = useReactTable({
     data,
     columns,

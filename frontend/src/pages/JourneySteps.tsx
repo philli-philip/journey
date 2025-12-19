@@ -5,7 +5,7 @@ import { type Journey } from "@/types/journey";
 import useJourney from "@/hooks/useJourney";
 
 export default function JourneyView() {
-  let { journeyId } = useParams();
+  const { journeyId } = useParams();
   const { journey, loading, error } = useJourney(journeyId as string);
 
   if (loading) {

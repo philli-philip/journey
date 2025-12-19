@@ -52,7 +52,7 @@ fastify.put("/journeys/:id", async (request, reply) => {
   };
 
   const fields: string[] = [];
-  const values: any[] = [];
+  const values: string[] = [];
 
   if (name !== undefined) {
     fields.push("name = ?");

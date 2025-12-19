@@ -4,7 +4,7 @@ import { SidebarTrigger } from "../ui/sidebar";
 import { ArrowLeftIcon } from "lucide-react";
 import useJourney from "@/hooks/useJourney";
 import { Empty, EmptyTitle } from "../ui/empty";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 
@@ -21,25 +21,11 @@ const navItems = (journeyId: string) => [
 
 export default function ViewLayout() {
   const journeyId = useParams().journeyId;
-
-  if (!journeyId) {
-    return (
-      <Empty>
-        <EmptyTitle>404 Not Found</EmptyTitle>
-      </Empty>
-    );
-  }
-
-  const { journey, loading, error, updateJourney } = useJourney(journeyId);
-
+  const { journey, loading, error, updateJourney } = useJourney(
+    journeyId ?? ""
+  );
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
-
-  useEffect(() => {
-    if (journey) {
-      setEditedTitle(journey.name);
-    }
-  }, [journey]);
 
   const handleTitleUpdate = async () => {
     if (!journeyId || !journey || editedTitle === journey.name) {
@@ -52,6 +38,14 @@ export default function ViewLayout() {
     });
     setIsEditingTitle(false);
   };
+
+  if (!journeyId) {
+    return (
+      <Empty>
+        <EmptyTitle>404 Not Found</EmptyTitle>
+      </Empty>
+    );
+  }
 
   if (loading) {
     return (
