@@ -80,12 +80,23 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                onClick={() => navigate(`/journey/${row.original.id}/steps`)}
-                className="cursor-pointer"
+                className="cursor-pointer relative"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {cell.column.id === "name" ? (
+                      <Link
+                        to={`/journey/${row.original.id}/steps`}
+                        className="text-primary"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </Link>
+                    ) : (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
                   </TableCell>
                 ))}
               </TableRow>

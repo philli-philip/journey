@@ -1,7 +1,14 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { type UserJourney } from "@shared/types";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, MoreVerticalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { deleteJourney } from "@/api/journeys";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export const columns: ColumnDef<UserJourney>[] = [
   {
@@ -70,6 +77,33 @@ export const columns: ColumnDef<UserJourney>[] = [
       const date = new Date(row.getValue("updatedAt"));
       const formattedDate = date.toLocaleDateString();
       return <div className="text-secondary-foreground">{formattedDate}</div>;
+    },
+  },
+  {
+    accessorKey: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const journey = row.original;
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger className="z-10">
+            <Button variant="ghost">
+              <span className="sr-only">actions</span>
+              <MoreVerticalIcon size={12} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              onClick={async (event) => {
+                event.preventDefault();
+                await deleteJourney(journey.id);
+              }}
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
     },
   },
 ];

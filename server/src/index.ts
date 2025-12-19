@@ -8,7 +8,7 @@ const fastify = Fastify({
 
 fastify.register(cors, {
   origin: "http://localhost:5174", // Allow requests from your frontend origin
-  methods: ["GET", "PUT"], // Allow only GET and PUT requests
+  methods: ["GET", "PUT", "DELETE"], // Allow GET, PUT, and DELETE requests
 });
 
 fastify.get("/journeys", async (request, reply) => {
@@ -84,6 +84,24 @@ fastify.put("/journeys/:id", async (request, reply) => {
         resolve({ message: "Journey updated successfully" });
       }
     );
+  });
+});
+
+fastify.delete("/journeys/:id", async (request, reply) => {
+  const { id } = request.params as { id: string };
+  return new Promise((resolve, reject) => {
+    db.run("DELETE FROM user_journeys WHERE id = ?", [id], function (err) {
+      if (err) {
+        reply.code(500).send({ message: "Error deleting journey" });
+        reject(err);
+      }
+      if (this.changes === 0) {
+        reply.code(404).send({ message: "Journey not found" });
+        resolve(null);
+      }
+      reply.code(200).send({ message: "Journey deleted successfully" });
+      resolve({ message: "Journey deleted successfully" });
+    });
   });
 });
 

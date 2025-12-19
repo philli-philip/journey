@@ -34,3 +34,12 @@ export async function updateJourney(
   }
   return response.json();
 }
+export async function deleteJourney(id: string) {
+  const response = await fetch(`${API_BASE_URL}/journeys/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to delete journey with id ${id}`);
+  }
+  return response.json();
+}
