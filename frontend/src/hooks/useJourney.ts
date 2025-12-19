@@ -23,8 +23,6 @@ export default function useJourney(journeyId: string) {
               ? JSON.parse(data.steps)
               : data.steps,
         });
-
-        console.log(journey);
       } catch (error) {
         console.error(error);
         setError(true);

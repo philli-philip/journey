@@ -27,8 +27,6 @@ export default function JourneyView() {
               ? JSON.parse(data.steps)
               : data.steps,
         });
-
-        console.log(journey);
       } catch (error) {
         console.error(error);
         setError(true);
