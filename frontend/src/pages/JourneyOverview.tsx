@@ -1,11 +1,14 @@
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import useJourney from "@/hooks/useJourney";
 import { useParams } from "react-router-dom";
+import MarkdownEditor from "@/components/MarkdownEditor";
 
 export default function JourneyOverview() {
   const journeyId = useParams().journeyId;
 
-  const { journey, loading, error } = useJourney(journeyId as string);
+  const { journey, loading, error, updateJourney } = useJourney(
+    journeyId as string
+  );
 
   if (!journeyId) {
     return (
@@ -31,5 +34,21 @@ export default function JourneyOverview() {
     );
   }
 
-  return <div className="mx-auto max-w-4xl p-4">{journey.description}</div>;
+  const handleDescriptionChange = (newDescription: string) => {
+    if (journeyId) {
+      updateJourney({
+        id: journeyId,
+        updates: { description: newDescription },
+      });
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-4xl p-4">
+      <MarkdownEditor
+        value={journey.description || ""}
+        onChange={handleDescriptionChange}
+      />
+    </div>
+  );
 }

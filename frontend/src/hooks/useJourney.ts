@@ -26,7 +26,6 @@ export default function useJourney(journeyId: string) {
     }) => updateJourney(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
-      toast.success("Journey updated successfully!");
     },
   });
 

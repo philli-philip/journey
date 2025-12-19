@@ -114,8 +114,8 @@ export default function ViewLayout() {
             className={({ isActive }) =>
               cn(
                 isActive &&
-                  "after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-accent-foreground",
-                "mr-4 px-1 py-0.5 hover:bg-accent rounded relative"
+                  "after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-accent-foreground",
+                "mr-4 px-2 py-0.5 mb-2 hover:bg-accent rounded relative duration-150"
               )
             }
             to={`/journey/${item.path}`}

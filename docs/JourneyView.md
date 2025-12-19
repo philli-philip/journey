@@ -6,7 +6,7 @@ Each User journey generally has two parts. The first is the journey steps and th
 
 ## Metadata
 
-Title should be at the top of the page. Metadata can be accessed via a side panel. The metadata can be displayed in a key-value pair form. Except the description wich is just stand alone.
+Title should be at the top of the page. Metadata can be accessed via a side panel. The metadata can be displayed in a key-value pair form. Except the description wich is just stand alone. The description is done in markdown format.
 
 ## Steps
 
