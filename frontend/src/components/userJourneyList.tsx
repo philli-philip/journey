@@ -101,9 +101,11 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
             ))
           ) : (
             <TableRow className="hover:bg-transparent">
-              <Empty>
-                <EmptyTitle>No journeys yet</EmptyTitle>
-              </Empty>
+              <td>
+                <Empty>
+                  <EmptyTitle>No journeys yet</EmptyTitle>
+                </Empty>
+              </td>
             </TableRow>
           )}
         </TableBody>
