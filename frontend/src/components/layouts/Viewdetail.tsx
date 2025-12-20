@@ -94,6 +94,7 @@ export default function ViewLayout() {
         {isEditingTitle ? (
           <Input
             value={editedTitle}
+            onFocus={() => setEditedTitle(journey.name)}
             onChange={(e) => setEditedTitle(e.target.value)}
             onBlur={handleTitleUpdate}
             autoFocus
