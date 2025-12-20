@@ -4,7 +4,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 
 const fastify = Fastify({
-  logger: false,
+  logger: true,
 });
 
 fastify.register(cors, {
@@ -83,9 +83,12 @@ fastify.get("/journeys/:id", async (request, reply) => {
 
 fastify.put("/journeys/:id", async (request, reply) => {
   const { id } = request.params as { id: string };
-  const { name, description } = request.body as {
+  console.log("Request Body:", request.body);
+  console.log("Content-Type:", request.headers["content-type"]);
+  const { name, description, steps } = request.body as {
     name?: string;
     description?: string;
+    steps?: string | object;
   };
 
   const fields: string[] = [];
@@ -100,18 +103,28 @@ fastify.put("/journeys/:id", async (request, reply) => {
     values.push(description);
   }
 
+  if (steps !== undefined) {
+    fields.push("steps = ?");
+    if (typeof steps === "object") {
+      values.push(JSON.stringify(steps));
+    } else {
+      values.push(steps);
+    }
+    console.log("found steps", steps);
+    fastify.log.info({ steps });
+  }
+
   if (fields.length === 0) {
     reply.code(400).send({ message: "No fields provided to update" });
     return;
   }
 
-  fields.push("updatedAt = CURRENT_TIMESTAMP");
-  values.push(id);
-
   return new Promise((resolve, reject) => {
     db.run(
-      `UPDATE user_journeys SET ${fields.join(", ")} WHERE id = ?`,
-      values,
+      `UPDATE user_journeys SET ${fields.join(
+        ", "
+      )}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`,
+      [...values, id],
       function (err) {
         if (err) {
           reply.code(500).send({ message: "Error updating journey" });

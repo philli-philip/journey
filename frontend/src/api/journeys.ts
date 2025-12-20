@@ -31,7 +31,7 @@ export async function fetchJourneyById(id: string) {
 
 export async function updateJourney(
   id: string,
-  updates: { name?: string; description?: string }
+  updates: { name?: string; description?: string; steps?: string }
 ) {
   const response = await fetch(`${API_BASE_URL}/journeys/${id}`, {
     method: "PUT",

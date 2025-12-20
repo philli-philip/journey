@@ -1,8 +1,11 @@
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import { useParams } from "react-router-dom";
 import { Layer } from "@/components/journey/layer";
-import { type Journey } from "@/types/journey";
+import type { UserJourney } from "@shared/types";
 import useJourney from "@/hooks/useJourney";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateJourney } from "@/api/journeys";
+import { toast } from "sonner";
 
 export default function JourneyView() {
   const { journeyId } = useParams();
@@ -20,7 +23,79 @@ export default function JourneyView() {
     );
   }
 
-  const currentJourney: Journey = journey;
+  const currentJourney: UserJourney = journey;
+
+  const queryClient = useQueryClient();
+  const updateJourneyMutation = useMutation({
+    mutationFn: ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: { name?: string; description?: string; steps?: string };
+    }) => updateJourney(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
+    },
+    onError: (error) => {
+      toast.error("Failed to update journey: " + error.message);
+    },
+  });
+
+  const onUpdateDescription = (index: number, newDescription: string) => {
+    const updatedSteps = currentJourney.steps.map((step, i) =>
+      i === index ? { ...step, description: newDescription } : step
+    );
+    updateJourneyMutation.mutate({
+      id: currentJourney.id,
+      updates: { steps: JSON.stringify(updatedSteps) },
+    });
+  };
+
+  const onUpdateService = (index: number, newService: string) => {
+    const updatedSteps = currentJourney.steps.map((step, i) =>
+      i === index
+        ? {
+            ...step,
+            attributes: { ...step.attributes, services: newService },
+          }
+        : step
+    );
+    updateJourneyMutation.mutate({
+      id: currentJourney.id,
+      updates: { steps: JSON.stringify(updatedSteps) },
+    });
+  };
+
+  const onUpdateInsight = (index: number, newInsight: string) => {
+    const updatedSteps = currentJourney.steps.map((step, i) =>
+      i === index
+        ? {
+            ...step,
+            attributes: { ...step.attributes, insights: newInsight },
+          }
+        : step
+    );
+    updateJourneyMutation.mutate({
+      id: currentJourney.id,
+      updates: { steps: JSON.stringify(updatedSteps) },
+    });
+  };
+
+  const onUpdatePainPoint = (index: number, newPainPoint: string) => {
+    const updatedSteps = currentJourney.steps.map((step, i) =>
+      i === index
+        ? {
+            ...step,
+            attributes: { ...step.attributes, pains: newPainPoint },
+          }
+        : step
+    );
+    updateJourneyMutation.mutate({
+      id: currentJourney.id,
+      updates: { steps: JSON.stringify(updatedSteps) },
+    });
+  };
 
   const tiles = currentJourney.steps.map((step) => step.name);
   const descriptions = currentJourney.steps.map((step) => step.description);
@@ -56,11 +131,27 @@ export default function JourneyView() {
           renderItem={renderTitle}
           className="rounded-t-lg"
         />
-        <Layer title={"Description"} data={descriptions} />
         <Layer title={"Image"} data={images} renderItem={renderImage} />
-        <Layer title={"Pain Point"} data={painPoints} />
-        <Layer title={"Insights"} data={insights} />
-        <Layer title={"Services"} data={services} />
+        <Layer
+          title={"Description"}
+          data={descriptions}
+          onUpdateItem={onUpdateDescription}
+        />
+        <Layer
+          title={"Pain Point"}
+          data={painPoints}
+          onUpdateItem={onUpdatePainPoint}
+        />
+        <Layer
+          title={"Insights"}
+          data={insights}
+          onUpdateItem={onUpdateInsight}
+        />
+        <Layer
+          title={"Services"}
+          data={services}
+          onUpdateItem={onUpdateService}
+        />
         <Layer
           title={""}
           data={empty}

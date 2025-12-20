@@ -9,12 +9,14 @@ export function Layer({
   renderItem = (item: string) => item,
   hideToggle = false,
   className,
+  onUpdateItem,
 }: {
   title: string;
   data: string[];
   renderItem?: (item: string) => React.ReactNode;
   hideToggle?: boolean;
   className?: string;
+  onUpdateItem?: (index: number, newItem: string) => void;
 }) {
   const [open, setOpen] = useState<boolean>(true);
   return (
@@ -47,7 +49,15 @@ export function Layer({
               key={index}
               className={cn("p-2 flex-1 min-w-48 border-b bg-card", className)}
             >
-              {renderItem(item)}
+              {onUpdateItem ? (
+                <textarea
+                  className="w-full h-full bg-card resize-none focus:outline-none"
+                  value={item}
+                  onChange={(e) => onUpdateItem(index, e.target.value)}
+                />
+              ) : (
+                renderItem(item)
+              )}
             </div>
           );
         } else {
