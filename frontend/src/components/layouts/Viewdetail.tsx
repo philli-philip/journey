@@ -74,10 +74,15 @@ export default function ViewLayout() {
         >
           <SidebarTrigger />
         </Button>
-        <Button asChild variant="ghost" size="sm">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground"
+        >
           <NavLink to="/">
-            <ArrowLeftIcon size="16" className="text-secondary-foreground" />
-            <span className="text-muted-foreground">Journeys</span>
+            <ArrowLeftIcon size="16" />
+            <span>User journeys</span>
           </NavLink>
         </Button>
         <span className="text-lg text-gray-400">/</span>
@@ -85,22 +90,24 @@ export default function ViewLayout() {
           {journey.name}
         </span>
       </div>
-      <div data-slot="journey-header" className="p-2 ">
+      <div data-slot="journey-header" className="p-2 pl-4">
         {isEditingTitle ? (
           <Input
             value={editedTitle}
             onChange={(e) => setEditedTitle(e.target.value)}
             onBlur={handleTitleUpdate}
+            autoFocus
+            placeholder="Journey title"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleTitleUpdate();
               }
             }}
-            className="text-xl font-semibold pl-2 pt-4"
+            className="text-xl p-0 m-0 font-semibold border-transparent outline-0 shadow-none placeholder:text-muted-foreground"
           />
         ) : (
           <h1
-            className="font-semibold text-xl text-foreground pl-2 pt-4 cursor-pointer"
+            className="font-semibold text-xl text-foreground pt-2 cursor-pointer"
             onClick={() => setIsEditingTitle(true)}
           >
             {journey.name}
