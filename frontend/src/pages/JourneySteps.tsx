@@ -13,8 +13,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVerticalIcon, PlusIcon } from "lucide-react";
+import { GripVerticalIcon, MoreVerticalIcon, PlusIcon } from "lucide-react";
 import { randomID } from "@shared/randomID";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function JourneyView() {
   const { journeyId } = useParams();
@@ -145,7 +161,10 @@ export default function JourneyView() {
 
     return (
       <div className="flex flex-row items-center justify-between">
-        <span className="text-foreground font-bold capitalize">{title}</span>
+        <div className="flex flex-row items-center gap-2">
+          <GripVerticalIcon size={16} className="text-muted-foreground" />
+          <span className="text-foreground font-bold capitalize">{title}</span>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button
@@ -185,54 +204,125 @@ export default function JourneyView() {
     );
   }
 
+  function SortableItem(props: { id: string; children: React.ReactNode }) {
+    const { attributes, listeners, setNodeRef, transform, transition, isOver } =
+      useSortable({ id: props.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className={isOver ? "border-2 border-dashed border-blue-500" : ""}
+      >
+        {props.children}
+      </div>
+    );
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = currentJourney.steps.findIndex(
+        (step) => step.id === active.id
+      );
+      const newIndex = currentJourney.steps.findIndex(
+        (step) => step.id === over?.id
+      );
+
+      const updatedSteps = arrayMove(currentJourney.steps, oldIndex, newIndex);
+
+      updateJourneyMutation.mutate({
+        id: currentJourney.id,
+        updates: { steps: JSON.stringify(updatedSteps) },
+      });
+    }
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: (event: KeyboardEvent, { currentCoordinates }) => {
+        if (event.code === "Space") {
+          return currentCoordinates;
+        }
+        return undefined;
+      },
+    })
+  );
+
   return (
-    <div className=" pt-4 flex flex-row bg-neutral-50 h-full">
-      <div className="overflow-x-scroll h-full">
-        <Layer
-          title={"Step"}
-          data={titles}
-          hideToggle
-          stepIds={currentJourney.steps.map((step) => step.id)}
-          renderItem={(stepId, title) => renderTitle(title, stepId)}
-          className="rounded-t-lg"
-        />
-        <Layer
-          title={"Image"}
-          data={images}
-          renderItem={renderImage}
-          stepIds={currentJourney.steps.map((step) => step.id)}
-        />
-        <Layer
-          title={"Description"}
-          data={descriptions}
-          stepIds={currentJourney.steps.map((step) => step.id)}
-          onUpdateItem={onUpdateDescription}
-        />
-        <Layer
-          title={"Pain Point"}
-          data={painPoints}
-          stepIds={currentJourney.steps.map((step) => step.id)}
-          onUpdateItem={onUpdatePainPoint}
-        />
-        <Layer
-          title={"Insights"}
-          data={insights}
-          stepIds={currentJourney.steps.map((step) => step.id)}
-          onUpdateItem={onUpdateInsight}
-        />
-        <Layer
-          title={"Services"}
-          data={services}
-          stepIds={currentJourney.steps.map((step) => step.id)}
-          onUpdateItem={onUpdateService}
-        />
-      </div>
-      <div className="px-2">
-        <Button variant="outline" size="icon-sm" onClick={AddStep}>
-          <span className="sr-only">Add Step</span>
-          <PlusIcon size="16" />
-        </Button>
-      </div>
-    </div>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={currentJourney.steps.map((step) => step.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className=" pt-4 flex flex-row bg-neutral-50 h-full">
+          <div className="overflow-x-scroll h-full">
+            <Layer
+              title={"Step"}
+              data={titles}
+              hideToggle
+              stepIds={currentJourney.steps.map((step) => step.id)}
+              renderItem={(stepId, title) => (
+                <SortableItem id={stepId}>
+                  {renderTitle(title, stepId)}
+                </SortableItem>
+              )}
+              className="rounded-t-lg"
+            />
+            <Layer
+              title={"Image"}
+              data={images}
+              renderItem={(stepId, img) => (
+                <SortableItem id={stepId}>{renderImage(img)}</SortableItem>
+              )}
+              stepIds={currentJourney.steps.map((step) => step.id)}
+            />
+            <Layer
+              title={"Description"}
+              data={descriptions}
+              stepIds={currentJourney.steps.map((step) => step.id)}
+              onUpdateItem={onUpdateDescription}
+            />
+            <Layer
+              title={"Pain Point"}
+              data={painPoints}
+              stepIds={currentJourney.steps.map((step) => step.id)}
+              onUpdateItem={onUpdatePainPoint}
+            />
+            <Layer
+              title={"Insights"}
+              data={insights}
+              stepIds={currentJourney.steps.map((step) => step.id)}
+              onUpdateItem={onUpdateInsight}
+            />
+            <Layer
+              title={"Services"}
+              data={services}
+              stepIds={currentJourney.steps.map((step) => step.id)}
+              onUpdateItem={onUpdateService}
+            />
+          </div>
+          <div className="px-2">
+            <Button variant="outline" size="icon-sm" onClick={AddStep}>
+              <span className="sr-only">Add Step</span>
+              <PlusIcon size="16" />
+            </Button>
+          </div>
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }
