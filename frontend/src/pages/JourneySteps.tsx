@@ -13,7 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVerticalIcon } from "lucide-react";
+import { MoreVerticalIcon, PlusIcon } from "lucide-react";
+import { randomID } from "@shared/randomID";
 
 export default function JourneyView() {
   const { journeyId } = useParams();
@@ -111,7 +112,25 @@ export default function JourneyView() {
   const painPoints = currentJourney.steps.map((step) => step.attributes.pains);
   const insights = currentJourney.steps.map((step) => step.attributes.insights);
   const services = currentJourney.steps.map((step) => step.attributes.services);
-  const empty = currentJourney.steps.map(() => "");
+
+  function AddStep() {
+    const newStep = {
+      id: randomID(),
+      name: "New Step",
+      description: "",
+      img: "",
+      attributes: {
+        pains: "",
+        insights: "",
+        services: "",
+      },
+    };
+    const updatedSteps = [...currentJourney.steps, newStep];
+    updateJourneyMutation.mutate({
+      id: currentJourney.id,
+      updates: { steps: JSON.stringify(updatedSteps) },
+    });
+  }
 
   function renderTitle(title: string, stepId: string) {
     function deleteStep(journeyId: string, stepId: string) {
@@ -167,8 +186,8 @@ export default function JourneyView() {
   }
 
   return (
-    <div className="w-full h-full">
-      <div className="pt-4 bg-neutral-50 h-full">
+    <div className=" pt-4 flex flex-row bg-neutral-50 h-full">
+      <div className="overflow-x-scroll h-full">
         <Layer
           title={"Step"}
           data={titles}
@@ -207,6 +226,12 @@ export default function JourneyView() {
           stepIds={currentJourney.steps.map((step) => step.id)}
           onUpdateItem={onUpdateService}
         />
+      </div>
+      <div className="px-2">
+        <Button variant="outline" size="icon-sm" onClick={AddStep}>
+          <span className="sr-only">Add Step</span>
+          <PlusIcon size="16" />
+        </Button>
       </div>
     </div>
   );

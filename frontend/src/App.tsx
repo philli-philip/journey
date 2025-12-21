@@ -32,8 +32,8 @@ function App() {
             />
           </Route>
         </Routes>
-        <Toaster />
       </SidebarProvider>
+      <Toaster />
     </QueryClientProvider>
   );
 }
