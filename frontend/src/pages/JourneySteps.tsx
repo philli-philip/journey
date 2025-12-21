@@ -6,6 +6,14 @@ import useJourney from "@/hooks/useJourney";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateJourney } from "@/api/journeys";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVerticalIcon } from "lucide-react";
 
 export default function JourneyView() {
   const { journeyId } = useParams();
@@ -97,7 +105,7 @@ export default function JourneyView() {
     });
   };
 
-  const tiles = currentJourney.steps.map((step) => step.name);
+  const titles = currentJourney.steps.map((step) => step.name);
   const descriptions = currentJourney.steps.map((step) => step.description);
   const images = currentJourney.steps.map((step) => step.img);
   const painPoints = currentJourney.steps.map((step) => step.attributes.pains);
@@ -105,9 +113,46 @@ export default function JourneyView() {
   const services = currentJourney.steps.map((step) => step.attributes.services);
   const empty = currentJourney.steps.map(() => "");
 
-  function renderTitle(title: string) {
+  function renderTitle(title: string, stepId: string) {
+    function deleteStep(journeyId: string, stepId: string) {
+      const updatedSteps = currentJourney.steps.filter(
+        (step) => step.id !== stepId
+      );
+      updateJourneyMutation.mutate({
+        id: journeyId,
+        updates: { steps: JSON.stringify(updatedSteps) },
+      });
+    }
+
     return (
-      <span className="text-foreground font-bold capitalize">{title}</span>
+      <div className="flex flex-row items-center justify-between">
+        <span className="text-foreground font-bold capitalize">{title}</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button
+              variant="ghost"
+              asChild
+              size="icon-sm"
+              className="muted-foreground"
+            >
+              <div>
+                <span className="sr-only">actions</span>
+                <MoreVerticalIcon size={12} />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={async (event) => {
+                event.preventDefault();
+                deleteStep(currentJourney.id, stepId);
+              }}
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     );
   }
 
@@ -126,37 +171,41 @@ export default function JourneyView() {
       <div className="pt-4 bg-neutral-50 h-full">
         <Layer
           title={"Step"}
-          data={tiles}
+          data={titles}
           hideToggle
-          renderItem={renderTitle}
+          stepIds={currentJourney.steps.map((step) => step.id)}
+          renderItem={(stepId, title) => renderTitle(title, stepId)}
           className="rounded-t-lg"
         />
-        <Layer title={"Image"} data={images} renderItem={renderImage} />
+        <Layer
+          title={"Image"}
+          data={images}
+          renderItem={renderImage}
+          stepIds={currentJourney.steps.map((step) => step.id)}
+        />
         <Layer
           title={"Description"}
           data={descriptions}
+          stepIds={currentJourney.steps.map((step) => step.id)}
           onUpdateItem={onUpdateDescription}
         />
         <Layer
           title={"Pain Point"}
           data={painPoints}
+          stepIds={currentJourney.steps.map((step) => step.id)}
           onUpdateItem={onUpdatePainPoint}
         />
         <Layer
           title={"Insights"}
           data={insights}
+          stepIds={currentJourney.steps.map((step) => step.id)}
           onUpdateItem={onUpdateInsight}
         />
         <Layer
           title={"Services"}
           data={services}
+          stepIds={currentJourney.steps.map((step) => step.id)}
           onUpdateItem={onUpdateService}
-        />
-        <Layer
-          title={""}
-          data={empty}
-          hideToggle
-          className="border-none rounded-b-lg"
         />
       </div>
     </div>

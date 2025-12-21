@@ -10,13 +10,15 @@ export function Layer({
   hideToggle = false,
   className,
   onUpdateItem,
+  stepIds,
 }: {
   title: string;
   data: string[];
-  renderItem?: (item: string) => React.ReactNode;
+  renderItem?: (stepId: string, data: any) => React.ReactNode;
   hideToggle?: boolean;
   className?: string;
   onUpdateItem?: (index: number, newItem: string) => void;
+  stepIds: string[];
 }) {
   const [open, setOpen] = useState<boolean>(true);
   return (
@@ -56,7 +58,7 @@ export function Layer({
                   onChange={(e) => onUpdateItem(index, e.target.value)}
                 />
               ) : (
-                renderItem(item)
+                renderItem(stepIds[index], item)
               )}
             </div>
           );
