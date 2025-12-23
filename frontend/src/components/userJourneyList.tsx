@@ -15,7 +15,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Empty, EmptyTitle } from "./ui/empty";
-import { Link } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,6 +33,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const router = useNavigate();
 
   /* eslint-disable-next-line */
   const table = useReactTable({
@@ -79,19 +80,16 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="cursor-pointer relative"
+                onClick={() => router(`/journey/${row.original.id}/steps`)}
+                className="cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    <Link
-                      to={`/journey/${row.original.id}/steps`}
-                      className="text-primary"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </Link>
+                  <TableCell
+                    key={cell.id}
+                    width={cell.column.columnDef.size}
+                    align={cell.column.columnDef.meta?.style.textAlign}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
               </TableRow>

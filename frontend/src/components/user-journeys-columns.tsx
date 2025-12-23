@@ -1,4 +1,4 @@
-import { type ColumnDef } from "@tanstack/react-table";
+import { type ColumnDef, type RowData } from "@tanstack/react-table";
 import { type UserJourney } from "@shared/types";
 import { ArrowUpDown, MoreVerticalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,16 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
+import "@tanstack/react-table"; //or vue, svelte, solid, qwik, etc.
+
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    style: {
+      textAlign: "left" | "center" | "right";
+    };
+  }
+}
+
 export const getColumns = ({
   deleteJourney,
 }: {
@@ -16,6 +26,8 @@ export const getColumns = ({
 }): ColumnDef<UserJourney>[] => [
   {
     accessorKey: "name",
+    minSize: 80,
+    size: 200,
     header: ({ column }) => {
       return (
         <Button
@@ -37,14 +49,6 @@ export const getColumns = ({
     header: "Description",
   },
   {
-    accessorKey: "steps",
-    header: "Steps",
-    cell: ({ row }) => {
-      const journey = row.original;
-      return <div>{journey.steps.length}</div>;
-    },
-  },
-  {
     accessorKey: "createdAt",
     header: ({ column }) => {
       return (
@@ -59,7 +63,11 @@ export const getColumns = ({
     },
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdAt"));
-      const formattedDate = date.toLocaleDateString();
+      const formattedDate = date.toLocaleDateString(navigator.language, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
       return <div className="text-secondary-foreground">{formattedDate}</div>;
     },
   },
@@ -78,13 +86,23 @@ export const getColumns = ({
     },
     cell: ({ row }) => {
       const date = new Date(row.getValue("updatedAt"));
-      const formattedDate = date.toLocaleDateString();
+      const formattedDate = date.toLocaleDateString(navigator.language, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
       return <div className="text-secondary-foreground">{formattedDate}</div>;
     },
   },
   {
     accessorKey: "actions",
     header: "Actions",
+    size: 1,
+    meta: {
+      style: {
+        textAlign: "right",
+      },
+    },
     cell: ({ row }) => {
       const journey = row.original;
 

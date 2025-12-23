@@ -151,42 +151,54 @@ export default function JourneyView() {
           className="flex gap-1 flex-row items-stretch flex-1 shrink w-50 overflow-x-scroll"
           data-slot="journey-steps"
         >
-          {steps.map((step, index) => (
-            <Reorder.Item
-              key={step.id}
-              value={step}
-              onDragStart={() => setActiveId(step.id)}
-              onDragEnd={() => setActiveId(null)}
-              className="flex-1"
-            >
-              <StepComponent
-                step={step}
-                index={index}
-                isDragging={activeId === step.id}
-                onUpdateDescription={(idx, val) =>
-                  onUpdateStepAttribute(idx, "description", val)
-                }
-                onUpdateService={(idx, val) =>
-                  onUpdateStepAttribute(idx, "services", val)
-                }
-                onUpdateInsight={(idx, val) =>
-                  onUpdateStepAttribute(idx, "insights", val)
-                }
-                onUpdatePainPoint={(idx, val) =>
-                  onUpdateStepAttribute(idx, "pains", val)
-                }
-                onDeleteStep={onDeleteStep}
-                onUpdateStepName={onUpdateStepName}
-              />
-            </Reorder.Item>
-          ))}
+          {steps.length === 0 ? (
+            <Empty className="flex-1">
+              <EmptyTitle>No steps yet. Add your first step!</EmptyTitle>
+              <Button variant="default" size="lg" onClick={AddStep}>
+                <PlusIcon size="16" className="mr-2" />
+                Add Step
+              </Button>
+            </Empty>
+          ) : (
+            <>
+              {steps.map((step, index) => (
+                <Reorder.Item
+                  key={step.id}
+                  value={step}
+                  onDragStart={() => setActiveId(step.id)}
+                  onDragEnd={() => setActiveId(null)}
+                  className="flex-1"
+                >
+                  <StepComponent
+                    step={step}
+                    index={index}
+                    isDragging={activeId === step.id}
+                    onUpdateDescription={(idx, val) =>
+                      onUpdateStepAttribute(idx, "description", val)
+                    }
+                    onUpdateService={(idx, val) =>
+                      onUpdateStepAttribute(idx, "services", val)
+                    }
+                    onUpdateInsight={(idx, val) =>
+                      onUpdateStepAttribute(idx, "insights", val)
+                    }
+                    onUpdatePainPoint={(idx, val) =>
+                      onUpdateStepAttribute(idx, "pains", val)
+                    }
+                    onDeleteStep={onDeleteStep}
+                    onUpdateStepName={onUpdateStepName}
+                  />
+                </Reorder.Item>
+              ))}
+              <div className="px-2 py-1.5 shrink-0">
+                <Button variant="outline" size="icon-sm" onClick={AddStep}>
+                  <span className="sr-only">Add Step</span>
+                  <PlusIcon size="16" />
+                </Button>
+              </div>
+            </>
+          )}
         </Reorder.Group>
-        <div className="px-2 py-1.5 shrink-0">
-          <Button variant="outline" size="icon-sm" onClick={AddStep}>
-            <span className="sr-only">Add Step</span>
-            <PlusIcon size="16" />
-          </Button>
-        </div>
       </GlobalCollapseProvider>
     </div>
   );
