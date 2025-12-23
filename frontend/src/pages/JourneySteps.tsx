@@ -1,54 +1,24 @@
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import { useParams } from "react-router-dom";
-import { Layer } from "@/components/journey/layer";
-import type { UserJourney } from "@shared/types";
 import useJourney from "@/hooks/useJourney";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateJourney } from "@/api/journeys";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { GripVerticalIcon, MoreVerticalIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { randomID } from "@shared/randomID";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-  useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { Reorder } from "framer-motion";
+import StepComponent from "@/components/journey/Step";
+import { GlobalCollapseProvider } from "@/components/journey/GlobalCollapseContext";
+import { LayerPanel } from "@/components/journey/GlobalCollapsePanel";
+import { useState } from "react";
+import type { Step } from "@shared/types";
 
 export default function JourneyView() {
   const { journeyId } = useParams();
   const { journey, loading, error } = useJourney(journeyId as string);
-
-  if (loading) {
-    return <div>Loading journey...</div>;
-  }
-
-  if (error || !journey || !journey.steps) {
-    return (
-      <Empty>
-        <EmptyTitle>Failed to fetch journey or steps not found</EmptyTitle>
-      </Empty>
-    );
-  }
-
-  const currentJourney: UserJourney = journey;
+  const [steps, setSteps] = useState<Step[]>(journey?.steps || []);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
   const updateJourneyMutation = useMutation({
@@ -67,67 +37,49 @@ export default function JourneyView() {
     },
   });
 
-  const onUpdateDescription = (index: number, newDescription: string) => {
-    const updatedSteps = currentJourney.steps.map((step, i) =>
-      i === index ? { ...step, description: newDescription } : step
-    );
-    updateJourneyMutation.mutate({
-      id: currentJourney.id,
-      updates: { steps: JSON.stringify(updatedSteps) },
-    });
-  };
-
-  const onUpdateService = (index: number, newService: string) => {
-    const updatedSteps = currentJourney.steps.map((step, i) =>
-      i === index
-        ? {
+  const onUpdateStepAttribute = (
+    stepIndex: number,
+    attribute: string,
+    newValue: string
+  ) => {
+    const updatedSteps = steps.map((step, i) => {
+      if (i === stepIndex) {
+        if (attribute === "description") {
+          return { ...step, description: newValue };
+        } else if (
+          step.attributes &&
+          (attribute === "pains" ||
+            attribute === "insights" ||
+            attribute === "services")
+        ) {
+          return {
             ...step,
-            attributes: { ...step.attributes, services: newService },
-          }
-        : step
-    );
+            attributes: { ...step.attributes, [attribute]: newValue },
+          };
+        }
+      }
+      return step;
+    });
+    if (!journey) {
+      return steps;
+    }
     updateJourneyMutation.mutate({
-      id: currentJourney.id,
+      id: journey.id,
       updates: { steps: JSON.stringify(updatedSteps) },
     });
   };
 
-  const onUpdateInsight = (index: number, newInsight: string) => {
-    const updatedSteps = currentJourney.steps.map((step, i) =>
-      i === index
-        ? {
-            ...step,
-            attributes: { ...step.attributes, insights: newInsight },
-          }
-        : step
-    );
+  const onDeleteStep = (stepId: string) => {
+    if (!journey) {
+      return steps;
+    }
+    const updatedSteps = steps.filter((step) => step.id !== stepId);
+    setSteps(updatedSteps);
     updateJourneyMutation.mutate({
-      id: currentJourney.id,
+      id: journey.id,
       updates: { steps: JSON.stringify(updatedSteps) },
     });
   };
-
-  const onUpdatePainPoint = (index: number, newPainPoint: string) => {
-    const updatedSteps = currentJourney.steps.map((step, i) =>
-      i === index
-        ? {
-            ...step,
-            attributes: { ...step.attributes, pains: newPainPoint },
-          }
-        : step
-    );
-    updateJourneyMutation.mutate({
-      id: currentJourney.id,
-      updates: { steps: JSON.stringify(updatedSteps) },
-    });
-  };
-
-  const titles = currentJourney.steps.map((step) => step.name);
-  const descriptions = currentJourney.steps.map((step) => step.description);
-  const images = currentJourney.steps.map((step) => step.img);
-  const painPoints = currentJourney.steps.map((step) => step.attributes.pains);
-  const insights = currentJourney.steps.map((step) => step.attributes.insights);
-  const services = currentJourney.steps.map((step) => step.attributes.services);
 
   function AddStep() {
     const newStep = {
@@ -141,188 +93,83 @@ export default function JourneyView() {
         services: "",
       },
     };
-    const updatedSteps = [...currentJourney.steps, newStep];
+    if (!journey?.id) return;
+    const updatedSteps = [...steps, newStep];
+    setSteps(updatedSteps);
     updateJourneyMutation.mutate({
-      id: currentJourney.id,
+      id: journey.id,
       updates: { steps: JSON.stringify(updatedSteps) },
     });
   }
 
-  function renderTitle(title: string, stepId: string) {
-    function deleteStep(journeyId: string, stepId: string) {
-      const updatedSteps = currentJourney.steps.filter(
-        (step) => step.id !== stepId
-      );
-      updateJourneyMutation.mutate({
-        id: journeyId,
-        updates: { steps: JSON.stringify(updatedSteps) },
-      });
-    }
+  if (loading) {
+    return <div>Loading journey...</div>;
+  }
 
+  if (error || !journey || !journey.steps) {
     return (
-      <div className="flex flex-row items-center justify-between">
-        <div className="flex flex-row items-center gap-2">
-          <GripVerticalIcon size={16} className="text-muted-foreground" />
-          <span className="text-foreground font-bold capitalize">{title}</span>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button
-              variant="ghost"
-              asChild
-              size="icon-sm"
-              className="muted-foreground"
-            >
-              <div>
-                <span className="sr-only">actions</span>
-                <MoreVerticalIcon size={12} />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={async (event) => {
-                event.preventDefault();
-                deleteStep(currentJourney.id, stepId);
-              }}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <Empty>
+        <EmptyTitle>Failed to fetch journey or steps not found</EmptyTitle>
+      </Empty>
     );
   }
-
-  function renderImage(img: string) {
-    return (
-      <img
-        src={img}
-        alt=""
-        className="object-cover max-w-full rounded-md border border-border"
-      />
-    );
-  }
-
-  function SortableItem(props: { id: string; children: React.ReactNode }) {
-    const { attributes, listeners, setNodeRef, transform, transition, isOver } =
-      useSortable({ id: props.id });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className={isOver ? "border-2 border-dashed border-blue-500" : ""}
-      >
-        {props.children}
-      </div>
-    );
-  }
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (active.id !== over?.id) {
-      const oldIndex = currentJourney.steps.findIndex(
-        (step) => step.id === active.id
-      );
-      const newIndex = currentJourney.steps.findIndex(
-        (step) => step.id === over?.id
-      );
-
-      const updatedSteps = arrayMove(currentJourney.steps, oldIndex, newIndex);
-
-      updateJourneyMutation.mutate({
-        id: currentJourney.id,
-        updates: { steps: JSON.stringify(updatedSteps) },
-      });
-    }
-  }
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: (event: KeyboardEvent, { currentCoordinates }) => {
-        if (event.code === "Space") {
-          return currentCoordinates;
-        }
-        return undefined;
-      },
-    })
-  );
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
+    <div
+      className="flex gap-1 flex-row pt-4 bg-neutral-100 flex-1 shrink items-stretch"
+      data-slot="cards"
     >
-      <SortableContext
-        items={currentJourney.steps.map((step) => step.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className=" pt-4 flex flex-row bg-neutral-50 h-full">
-          <div className="overflow-x-scroll h-full">
-            <Layer
-              title={"Step"}
-              data={titles}
-              hideToggle
-              stepIds={currentJourney.steps.map((step) => step.id)}
-              renderItem={(stepId, title) => (
-                <SortableItem id={stepId}>
-                  {renderTitle(title, stepId)}
-                </SortableItem>
-              )}
-              className="rounded-t-lg"
-            />
-            <Layer
-              title={"Image"}
-              data={images}
-              renderItem={(stepId, img) => (
-                <SortableItem id={stepId}>{renderImage(img)}</SortableItem>
-              )}
-              stepIds={currentJourney.steps.map((step) => step.id)}
-            />
-            <Layer
-              title={"Description"}
-              data={descriptions}
-              stepIds={currentJourney.steps.map((step) => step.id)}
-              onUpdateItem={onUpdateDescription}
-            />
-            <Layer
-              title={"Pain Point"}
-              data={painPoints}
-              stepIds={currentJourney.steps.map((step) => step.id)}
-              onUpdateItem={onUpdatePainPoint}
-            />
-            <Layer
-              title={"Insights"}
-              data={insights}
-              stepIds={currentJourney.steps.map((step) => step.id)}
-              onUpdateItem={onUpdateInsight}
-            />
-            <Layer
-              title={"Services"}
-              data={services}
-              stepIds={currentJourney.steps.map((step) => step.id)}
-              onUpdateItem={onUpdateService}
-            />
-          </div>
-          <div className="px-2">
-            <Button variant="outline" size="icon-sm" onClick={AddStep}>
-              <span className="sr-only">Add Step</span>
-              <PlusIcon size="16" />
-            </Button>
-          </div>
+      <GlobalCollapseProvider>
+        <LayerPanel />
+        <Reorder.Group
+          axis="x"
+          values={steps}
+          onReorder={(newOrder) => {
+            setSteps(newOrder);
+            updateJourneyMutation.mutate({
+              id: journey.id,
+              updates: { steps: JSON.stringify(newOrder) },
+            });
+          }}
+          className="flex gap-1 flex-row items-stretch flex-1 shrink w-50 overflow-x-scroll"
+          data-slot="journey-steps"
+        >
+          {steps.map((step, index) => (
+            <Reorder.Item
+              key={step.id}
+              value={step}
+              onDragStart={() => setActiveId(step.id)}
+              onDragEnd={() => setActiveId(null)}
+              className="flex-1"
+            >
+              <StepComponent
+                step={step}
+                index={index}
+                isDragging={activeId === step.id}
+                onUpdateDescription={(idx, val) =>
+                  onUpdateStepAttribute(idx, "description", val)
+                }
+                onUpdateService={(idx, val) =>
+                  onUpdateStepAttribute(idx, "services", val)
+                }
+                onUpdateInsight={(idx, val) =>
+                  onUpdateStepAttribute(idx, "insights", val)
+                }
+                onUpdatePainPoint={(idx, val) =>
+                  onUpdateStepAttribute(idx, "pains", val)
+                }
+                onDeleteStep={onDeleteStep}
+              />
+            </Reorder.Item>
+          ))}
+        </Reorder.Group>
+        <div className="px-2 py-1.5 shrink-0">
+          <Button variant="outline" size="icon-sm" onClick={AddStep}>
+            <span className="sr-only">Add Step</span>
+            <PlusIcon size="16" />
+          </Button>
         </div>
-      </SortableContext>
-    </DndContext>
+      </GlobalCollapseProvider>
+    </div>
   );
 }

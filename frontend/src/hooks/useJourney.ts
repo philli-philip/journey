@@ -46,7 +46,7 @@ export default function useJourney(journeyId: string) {
         ) as Step[];
 
         const updatedSteps = currentSteps.map((step: Step) => {
-          if ((step as any).id === stepId) {
+          if ((step as Step).id === stepId) {
             if (attribute === "description") {
               return { ...step, description: newValue };
             } else if (step.attributes && attribute) {
