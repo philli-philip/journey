@@ -19,6 +19,7 @@ interface StepProps {
   onUpdateInsight: (index: number, newInsight: string) => void;
   onUpdatePainPoint: (index: number, newPainPoint: string) => void;
   onDeleteStep: (stepId: string) => void;
+  onUpdateStepName: (index: number, newName: string) => void;
   isDragging?: boolean;
 }
 
@@ -30,6 +31,7 @@ export default function StepComponent({
   onUpdateInsight,
   onUpdatePainPoint,
   onDeleteStep,
+  onUpdateStepName,
   isDragging,
 }: StepProps) {
   const { attributes, listeners, setNodeRef } = useSortable({ id: step.id });
@@ -58,9 +60,12 @@ export default function StepComponent({
           {...attributes}
           {...listeners}
         />
-        <span className="text-foreground font-semibold capitalize truncate flex-1">
-          {step.name}
-        </span>
+        <input
+          type="text"
+          className="text-foreground font-semibold capitalize truncate flex-1 bg-transparent focus:outline-none"
+          value={step.name}
+          onChange={(e) => onUpdateStepName(index, e.target.value)}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button

@@ -81,6 +81,23 @@ export default function JourneyView() {
     });
   };
 
+  const onUpdateStepName = (stepIndex: number, newName: string) => {
+    const updatedSteps = steps.map((step, i) => {
+      if (i === stepIndex) {
+        return { ...step, name: newName };
+      }
+      return step;
+    });
+    if (!journey) {
+      return;
+    }
+    setSteps(updatedSteps);
+    updateJourneyMutation.mutate({
+      id: journey.id,
+      updates: { steps: JSON.stringify(updatedSteps) },
+    });
+  };
+
   function AddStep() {
     const newStep = {
       id: randomID(),
@@ -159,6 +176,7 @@ export default function JourneyView() {
                   onUpdateStepAttribute(idx, "pains", val)
                 }
                 onDeleteStep={onDeleteStep}
+                onUpdateStepName={onUpdateStepName}
               />
             </Reorder.Item>
           ))}
