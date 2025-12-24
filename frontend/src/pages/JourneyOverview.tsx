@@ -44,11 +44,10 @@ export default function JourneyOverview() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl p-4">
-      <MarkdownEditor
-        value={journey.description || ""}
-        onChange={handleDescriptionChange}
-      />
-    </div>
+    <MarkdownEditor
+      value={journey.description || ""}
+      onChange={handleDescriptionChange}
+      className="mx-auto max-w-4xl p-4 w-full"
+    />
   );
 }
