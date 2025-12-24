@@ -62,7 +62,7 @@ export default function StepComponent({
         />
         <input
           type="text"
-          className="text-foreground font-semibold capitalize truncate flex-1 bg-transparent focus:outline-none"
+          className="text-foreground font-semibold truncate flex-1 bg-transparent focus:outline-none"
           value={step.name}
           onChange={(e) => onUpdateStepName(index, e.target.value)}
         />
