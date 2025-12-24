@@ -15,7 +15,6 @@ const Navigation = [
     name: "User Journeys",
     path: "/",
   },
-  { id: "uj2", name: "Teams", path: "/teams" },
 ];
 
 export default function AppSideBar() {
