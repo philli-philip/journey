@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 import {
   fetchJourneyById,
   updateJourney,
@@ -92,8 +93,8 @@ export default function useJourney(journeyId: string) {
     },
   });
 
-  return {
-    journey: data
+  const memoizedJourney = useMemo(() => {
+    return data
       ? {
           ...data,
           steps:
@@ -101,7 +102,11 @@ export default function useJourney(journeyId: string) {
               ? JSON.parse(data.steps)
               : data.steps,
         }
-      : undefined,
+      : undefined;
+  }, [data]);
+
+  return {
+    journey: memoizedJourney,
     loading: isLoading,
     error: error ? true : false,
     updateJourney: updateJourneyMutation.mutate,

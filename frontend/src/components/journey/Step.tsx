@@ -10,33 +10,40 @@ import { useSortable } from "@dnd-kit/sortable";
 import type { Step } from "@shared/types";
 import { cn } from "@/lib/utils";
 import { useGlobalCollapse } from "./GlobalCollapseContext";
+import { ImageCell } from "./DimensionCells";
+import { updateStep } from "../../api/steps";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface StepProps {
   step: Step;
   index: number;
-  onUpdateDescription: (index: number, newDescription: string) => void;
-  onUpdateService: (index: number, newService: string) => void;
-  onUpdateInsight: (index: number, newInsight: string) => void;
-  onUpdatePainPoint: (index: number, newPainPoint: string) => void;
+  journeyId: string;
   onDeleteStep: (stepId: string) => void;
-  onUpdateStepName: (index: number, newName: string) => void;
   isDragging?: boolean;
 }
 
 export default function StepComponent({
   step,
-  index,
-  onUpdateDescription,
-  onUpdateService,
-  onUpdateInsight,
-  onUpdatePainPoint,
+  journeyId,
   onDeleteStep,
-  onUpdateStepName,
   isDragging,
 }: StepProps) {
   const { attributes, listeners, setNodeRef } = useSortable({ id: step.id });
 
   const { globalCollapsedState } = useGlobalCollapse();
+  const queryClient = useQueryClient();
+
+  const stepMutation = useMutation({
+    mutationFn: (update: Object) => updateStep(journeyId, step.id, update),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
+      console.log("cleared and set");
+    },
+    onError: (error) => {
+      toast.error("Failed to update journey: " + error.message);
+    },
+  });
 
   const isDescriptionCollapsed = globalCollapsedState.description;
   const isPainPointCollapsed = globalCollapsedState.painPoints;
@@ -64,7 +71,7 @@ export default function StepComponent({
           type="text"
           className="text-foreground font-semibold truncate flex-1 bg-transparent focus:outline-none"
           value={step.name}
-          onChange={(e) => onUpdateStepName(index, e.target.value)}
+          onChange={(e) => stepMutation.mutate({ name: e.target.value })}
         />
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -95,11 +102,7 @@ export default function StepComponent({
 
       {/* Image section - fixed height 120px */}
       <Cell open={!isImageCollapsed} height="h-30">
-        <div className="rounded-md">
-          {!isImageCollapsed && step.img && (
-            <img src={step.img} alt="" className="object-cover w-full h-full" />
-          )}
-        </div>
+        <ImageCell img={step.img} stepId={step.id} />
       </Cell>
 
       {/* Description section*/}
@@ -107,7 +110,7 @@ export default function StepComponent({
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
           value={step.description}
-          onChange={(e) => onUpdateDescription(index, e.target.value)}
+          onChange={(e) => stepMutation.mutate({ description: e.target.value })}
           disabled={isDescriptionCollapsed}
         />
       </Cell>
@@ -117,7 +120,7 @@ export default function StepComponent({
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
           value={step.attributes?.pains || ""}
-          onChange={(e) => onUpdatePainPoint(index, e.target.value)}
+          onChange={(e) => stepMutation.mutate({ pains: e.target.value })}
           disabled={isPainPointCollapsed}
         />
       </Cell>
@@ -127,7 +130,7 @@ export default function StepComponent({
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
           value={step.attributes?.insights || ""}
-          onChange={(e) => onUpdateInsight(index, e.target.value)}
+          onChange={(e) => stepMutation.mutate({ insights: e.target.value })}
           disabled={isInsightsCollapsed}
         />
       </Cell>
@@ -137,7 +140,7 @@ export default function StepComponent({
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
           value={step.attributes?.services || ""}
-          onChange={(e) => onUpdateService(index, e.target.value)}
+          onChange={(e) => stepMutation.mutate({ services: e.target.value })}
           disabled={isServicesCollapsed}
         />
       </Cell>
@@ -157,7 +160,7 @@ function Cell({
   return (
     <div
       className={cn(
-        "duration-300 ease-in-out *:duration-300",
+        "duration-300 ease-in-out *:duration-300 group flex ",
         open ? `${height} *:opacity-100` : "h-12 *:opacity-0 "
       )}
     >
