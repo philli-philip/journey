@@ -8,15 +8,50 @@ export default async function stepRoutes(fastify: FastifyInstance) {
       journeyId: string;
     };
 
-    const newStepId = await new Promise<number>((resolve, reject) => {
+    const newStepId = await new Promise<string>((resolve, reject) => {
+      const id = randomID();
       db.run(
         "INSERT INTO steps (id, journeyID, name) VALUES (?,?,?)",
-        [randomID(), journeyId, "New Step"],
+        [id, journeyId, "New Step"],
         function (err) {
           if (err) {
             return reject(err);
           }
-          resolve(this.lastID);
+          resolve(id);
+        }
+      );
+    });
+
+    // Fetch the current orderedStepIds from the journey
+    const journey = await new Promise<any>((resolve, reject) => {
+      db.get(
+        "SELECT orderedStepIds FROM user_journeys WHERE id = ?",
+        [journeyId],
+        (err, row) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(row);
+        }
+      );
+    });
+
+    let orderedStepIds: string[] = [];
+    if (journey && journey.orderedStepIds) {
+      orderedStepIds = JSON.parse(journey.orderedStepIds);
+    }
+    orderedStepIds.push(newStepId);
+
+    // Update the journey with the new orderedStepIds
+    await new Promise<void>((resolve, reject) => {
+      db.run(
+        "UPDATE user_journeys SET orderedStepIds = ? WHERE id = ?",
+        [JSON.stringify(orderedStepIds), journeyId],
+        function (err) {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
         }
       );
     });
@@ -91,4 +126,36 @@ export default async function stepRoutes(fastify: FastifyInstance) {
     }
     return reply.code(200).send({ message: "Step updated successfully" });
   });
+
+  fastify.delete(
+    "/journeys/:journeyId/steps/:stepId",
+    async (request, reply) => {
+      const { journeyId, stepId } = request.params as {
+        journeyId: string;
+        stepId: string;
+      };
+
+      const changes = await new Promise<number>((resolve, reject) => {
+        db.run(
+          `
+      DELETE from steps
+      WHERE id = ?
+      `,
+          [stepId],
+          function (err) {
+            if (err) {
+              return reject(err);
+            }
+            resolve(this.changes);
+          }
+        );
+      });
+      if (changes === 0) {
+        return reply.code(404).send({
+          message: "Step not found or does not belong to the specified journey",
+        });
+      }
+      return reply.code(200).send({ message: "Step deleted successfully" });
+    }
+  );
 }

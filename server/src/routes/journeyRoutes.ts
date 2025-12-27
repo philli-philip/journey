@@ -59,14 +59,42 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
     const { id } = request.params as { id: string };
     return new Promise((resolve, reject) => {
       db.get(
-        `SELECT *, (
-          SELECT
-            json_group_array(json_object('id', id,'name', name,  'description', description, 'attributes', json_object('services', services, 'pains', painPoints, 'insights', insights)))
-          FROM
-            steps
-          WHERE steps.journeyId =?
-        ) AS steps FROM user_journeys WHERE id = ?`,
-        [id, id],
+        `SELECT
+          uj.id AS id,
+          uj.name AS name,
+          uj.description AS description,
+          uj.createdAt AS createdAt,
+          uj.updatedAt AS updatedAt,
+          uj.deletedAt AS deletedAt,
+          uj.orderedStepIds AS orderedStepIds,
+          (
+            SELECT
+              json_group_array(
+                json_object(
+                  'id', s.id,
+                  'name', s.name,
+                  'description', s.description,
+                  'attributes', json_object(
+                    'services', s.services,
+                    'pains', s.painPoints,
+                    'insights', s.insights
+                  )
+                )
+              )
+            FROM
+              json_each(uj.orderedStepIds) AS je
+            JOIN
+              steps AS s ON s.id = je.value
+            WHERE
+              s.journeyId = uj.id
+            ORDER BY
+              je.key
+          ) AS steps
+        FROM
+          user_journeys AS uj
+        WHERE
+          uj.id = ?`,
+        [id],
         (err, row) => {
           if (err) {
             reply.code(500).send({ message: "Error fetching journey" });
@@ -85,14 +113,16 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
     const { id } = request.params as { id: string };
     console.log("Request Body:", request.body);
     console.log("Content-Type:", request.headers["content-type"]);
-    const { name, description, steps } = request.body as {
+    const { name, description, stepOrder } = request.body as {
       name?: string;
       description?: string;
-      steps?: string | object;
+      stepOrder?: string[];
     };
 
+    console.log("stepOrder:", stepOrder);
+
     const fields: string[] = [];
-    const values: string[] = [];
+    const values: (string | string[])[] = [];
 
     if (name !== undefined) {
       fields.push("name = ?");
@@ -103,15 +133,19 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
       values.push(description);
     }
 
-    if (steps !== undefined) {
-      fields.push("steps = ?");
-      if (typeof steps === "object") {
-        values.push(JSON.stringify(steps));
+    if (stepOrder !== undefined) {
+      fields.push("orderedStepIds = ?");
+      if (Array.isArray(stepOrder)) {
+        values.push(JSON.stringify(stepOrder));
+      } else if (typeof stepOrder === "string") {
+        values.push(stepOrder);
       } else {
-        values.push(steps);
+        // Handle unexpected type, perhaps log an error or send a bad request response
+        fastify.log.warn("Unexpected type for stepOrder: " + typeof stepOrder);
+        reply.code(400).send({ message: "Invalid type for stepOrder" });
+        return;
       }
-      console.log("found steps", steps);
-      fastify.log.info({ steps });
+      fastify.log.info({ stepOrder });
     }
 
     if (fields.length === 0) {
@@ -127,12 +161,10 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
         [...values, id],
         function (err) {
           if (err) {
-            reply.code(500).send({ message: "Error updating journey" });
+            reply
+              .code(500)
+              .send({ message: "Error updating journey" + err.message });
             reject(err);
-          }
-          if (this.changes === 0) {
-            reply.code(404).send({ message: "Journey not found" });
-            resolve(null);
           }
           reply.code(200).send({ message: "Journey updated successfully" });
           resolve({ message: "Journey updated successfully" });

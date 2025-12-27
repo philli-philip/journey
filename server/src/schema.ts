@@ -3,6 +3,7 @@ export const CREATE_USER_JOURNEYS_TABLE = `
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
+    orderedStepIds TEXT DEFAULT '[]',
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL
@@ -12,9 +13,9 @@ export const CREATE_USER_JOURNEYS_TABLE = `
 export const CREATE_STEPS_TABLE = `
   CREATE TABLE IF NOT EXISTS steps (
     id TEXT PRIMARY KEY NOT NULL,
+    journeyId TEXT NOT NULL,
     name TEXT DEFAULT 'New Step',
     description TEXT,
-    journeyId TEXT NOT NULL,
     painPoints TEXT,
     insights TEXT,
     services TEXT,

@@ -14,12 +14,19 @@ import { ImageCell } from "./DimensionCells";
 import { updateStep } from "../../api/steps";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface StepProps {
   step: Step;
   index: number;
   journeyId: string;
-  onDeleteStep: (stepId: string) => void;
+  onDeleteStep: ({
+    stepId,
+    journeyId,
+  }: {
+    stepId: string;
+    journeyId: string;
+  }) => void;
   isDragging?: boolean;
 }
 
@@ -30,9 +37,13 @@ export default function StepComponent({
   isDragging,
 }: StepProps) {
   const { attributes, listeners, setNodeRef } = useSortable({ id: step.id });
-
   const { globalCollapsedState } = useGlobalCollapse();
   const queryClient = useQueryClient();
+  const [name, setName] = useState(step.name || "Step without name");
+  const [description, setDescription] = useState(step.description || "");
+  const [pains, setPains] = useState(step.attributes.pains || "");
+  const [insights, setInsights] = useState(step.attributes.insights || "");
+  const [services, setServices] = useState(step.attributes.services || "");
 
   const stepMutation = useMutation({
     mutationFn: (update: Object) => updateStep(journeyId, step.id, update),
@@ -70,8 +81,9 @@ export default function StepComponent({
         <input
           type="text"
           className="text-foreground font-semibold truncate flex-1 bg-transparent focus:outline-none"
-          value={step.name}
-          onChange={(e) => stepMutation.mutate({ name: e.target.value })}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={(e) => stepMutation.mutate({ name: e.target.value })}
         />
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -89,10 +101,9 @@ export default function StepComponent({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={async (event) => {
-                event.preventDefault();
-                onDeleteStep(step.id);
-              }}
+              onClick={() =>
+                onDeleteStep({ stepId: step.id, journeyId: journeyId })
+              }
             >
               Delete
             </DropdownMenuItem>
@@ -109,8 +120,9 @@ export default function StepComponent({
       <Cell open={!isDescriptionCollapsed}>
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={step.description || ""}
-          onChange={(e) => stepMutation.mutate({ description: e.target.value })}
+          value={description || ""}
+          onChange={(e) => setDescription(e.target.value)}
+          onBlur={(e) => stepMutation.mutate({ description: e.target.value })}
           disabled={isDescriptionCollapsed}
         />
       </Cell>
@@ -119,8 +131,9 @@ export default function StepComponent({
       <Cell open={!isPainPointCollapsed}>
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={step.attributes?.pains || ""}
-          onChange={(e) => stepMutation.mutate({ pains: e.target.value })}
+          value={pains || ""}
+          onChange={(e) => setPains(e.target.value)}
+          onBlur={(e) => stepMutation.mutate({ pains: e.target.value })}
           disabled={isPainPointCollapsed}
         />
       </Cell>
@@ -129,8 +142,9 @@ export default function StepComponent({
       <Cell open={!isInsightsCollapsed}>
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={step.attributes?.insights || ""}
-          onChange={(e) => stepMutation.mutate({ insights: e.target.value })}
+          value={insights || ""}
+          onChange={(e) => setInsights(e.target.value)}
+          onBlur={(e) => stepMutation.mutate({ insights: e.target.value })}
           disabled={isInsightsCollapsed}
         />
       </Cell>
@@ -139,8 +153,9 @@ export default function StepComponent({
       <Cell open={!isServicesCollapsed}>
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={step.attributes?.services || ""}
-          onChange={(e) => stepMutation.mutate({ services: e.target.value })}
+          value={services || ""}
+          onChange={(e) => setServices(e.target.value)}
+          onBlur={(e) => stepMutation.mutate({ services: e.target.value })}
           disabled={isServicesCollapsed}
         />
       </Cell>
