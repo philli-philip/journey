@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import db from "../db";
+import { randomID } from "@shared/randomID";
 
 export default async function stepRoutes(fastify: FastifyInstance) {
   fastify.post("/journeys/:journeyId/steps", async (request, reply) => {
@@ -9,8 +10,8 @@ export default async function stepRoutes(fastify: FastifyInstance) {
 
     const newStepId = await new Promise<number>((resolve, reject) => {
       db.run(
-        "INSERT INTO steps (journeyID, name) VALUES (?,?)",
-        [journeyId, "New Step"],
+        "INSERT INTO steps (id, journeyID, name) VALUES (?,?,?)",
+        [randomID(), journeyId, "New Step"],
         function (err) {
           if (err) {
             return reject(err);

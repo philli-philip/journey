@@ -11,7 +11,7 @@ export const CREATE_USER_JOURNEYS_TABLE = `
 
 export const CREATE_STEPS_TABLE = `
   CREATE TABLE IF NOT EXISTS steps (
-    id TEXT PRIMARY KEY,
+    id TEXT PRIMARY KEY NOT NULL,
     name TEXT DEFAULT 'New Step',
     description TEXT,
     journeyId TEXT NOT NULL,
@@ -22,13 +22,5 @@ export const CREATE_STEPS_TABLE = `
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL,
     FOREIGN KEY (journeyId) REFERENCES user_journeys(id)
-  )
-`;
-
-export const CREATE_MIGRATIONS_TABLE = `
-  CREATE TABLE IF NOT EXISTS migrations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    appliedAt TEXT DEFAULT CURRENT_TIMESTAMP
   )
 `;

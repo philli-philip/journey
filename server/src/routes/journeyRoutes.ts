@@ -13,7 +13,7 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
             reply.code(500).send({ message: "Error fetching journeys" });
             reject(err);
           }
-          resolve(rows);
+          return reply.status(200).send(rows);
         }
       );
     });
@@ -73,10 +73,9 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
             reject(err);
           }
           if (!row) {
-            reply.code(404).send({ message: "Journey not found" });
-            resolve(null);
+            return reply.code(404).send({ message: "Journey not found" });
           }
-          resolve(row);
+          return reply.code(200).send(row);
         }
       );
     });

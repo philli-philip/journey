@@ -2,7 +2,6 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import journeyRoutes from "./routes/journeyRoutes";
 import stepRoutes from "./routes/stepRoutes";
-import db from "./db";
 
 const fastify = Fastify({
   logger: true,
