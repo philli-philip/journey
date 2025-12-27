@@ -109,7 +109,7 @@ export default function StepComponent({
       <Cell open={!isDescriptionCollapsed}>
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={step.description}
+          value={step.description || ""}
           onChange={(e) => stepMutation.mutate({ description: e.target.value })}
           disabled={isDescriptionCollapsed}
         />
