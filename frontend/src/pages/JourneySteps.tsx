@@ -1,129 +1,33 @@
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import { useParams } from "react-router-dom";
 import useJourney from "@/hooks/useJourney";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateJourney } from "@/api/journeys";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { randomID } from "@shared/randomID";
 import { Reorder } from "framer-motion";
 import StepComponent from "@/components/journey/Step";
 import { GlobalCollapseProvider } from "@/components/journey/GlobalCollapseContext";
 import { LayerPanel } from "@/components/journey/GlobalCollapsePanel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Step } from "@shared/types";
 
 export default function JourneyView() {
   const { journeyId } = useParams();
-  const { journey, loading, error } = useJourney(journeyId as string);
+  const { journey, loading, error, updateJourney, deleteStep, addStep } =
+    useJourney(journeyId as string);
   const [steps, setSteps] = useState<Step[]>(journey?.steps || []);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const queryClient = useQueryClient();
-  const updateJourneyMutation = useMutation({
-    mutationFn: ({
-      id,
-      updates,
-    }: {
-      id: string;
-      updates: { name?: string; description?: string; steps?: string };
-    }) => updateJourney(id, updates),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
-    },
-    onError: (error) => {
-      toast.error("Failed to update journey: " + error.message);
-    },
-  });
-
-  const onUpdateStepAttribute = (
-    stepIndex: number,
-    attribute: string,
-    newValue: string
-  ) => {
-    const updatedSteps = steps.map((step, i) => {
-      if (i === stepIndex) {
-        if (attribute === "description") {
-          return { ...step, description: newValue };
-        } else if (
-          step.attributes &&
-          (attribute === "pains" ||
-            attribute === "insights" ||
-            attribute === "services")
-        ) {
-          return {
-            ...step,
-            attributes: { ...step.attributes, [attribute]: newValue },
-          };
-        }
-      }
-      return step;
-    });
-    if (!journey) {
-      return steps;
+  useEffect(() => {
+    if (journey?.steps) {
+      setSteps(journey.steps);
     }
-    updateJourneyMutation.mutate({
-      id: journey.id,
-      updates: { steps: JSON.stringify(updatedSteps) },
-    });
-  };
-
-  const onDeleteStep = (stepId: string) => {
-    if (!journey) {
-      return steps;
-    }
-    const updatedSteps = steps.filter((step) => step.id !== stepId);
-    setSteps(updatedSteps);
-    updateJourneyMutation.mutate({
-      id: journey.id,
-      updates: { steps: JSON.stringify(updatedSteps) },
-    });
-  };
-
-  const onUpdateStepName = (stepIndex: number, newName: string) => {
-    const updatedSteps = steps.map((step, i) => {
-      if (i === stepIndex) {
-        return { ...step, name: newName };
-      }
-      return step;
-    });
-    if (!journey) {
-      return;
-    }
-    setSteps(updatedSteps);
-    updateJourneyMutation.mutate({
-      id: journey.id,
-      updates: { steps: JSON.stringify(updatedSteps) },
-    });
-  };
-
-  function AddStep() {
-    const newStep = {
-      id: randomID(),
-      name: "New Step",
-      description: "",
-      img: "",
-      attributes: {
-        pains: "",
-        insights: "",
-        services: "",
-      },
-    };
-    if (!journey?.id) return;
-    const updatedSteps = [...steps, newStep];
-    setSteps(updatedSteps);
-    updateJourneyMutation.mutate({
-      id: journey.id,
-      updates: { steps: JSON.stringify(updatedSteps) },
-    });
-  }
+  }, [journey?.steps]);
 
   if (loading) {
     return <div>Loading journey...</div>;
   }
 
-  if (error || !journey || !journey.steps) {
+  if (error || !journey || !journey.steps || !journeyId) {
     return (
       <Empty>
         <EmptyTitle>Failed to fetch journey or steps not found</EmptyTitle>
@@ -143,9 +47,9 @@ export default function JourneyView() {
           values={steps}
           onReorder={(newOrder) => {
             setSteps(newOrder);
-            updateJourneyMutation.mutate({
+            updateJourney({
               id: journey.id,
-              updates: { steps: JSON.stringify(newOrder) },
+              updates: { stepOrder: newOrder.map((step) => step.id) },
             });
           }}
           className="flex gap-1 flex-row items-stretch flex-1 shrink w-50 overflow-x-scroll"
@@ -154,7 +58,11 @@ export default function JourneyView() {
           {steps.length === 0 ? (
             <Empty className="flex-1">
               <EmptyTitle>No steps yet. Add your first step!</EmptyTitle>
-              <Button variant="default" size="lg" onClick={AddStep}>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => addStep(journeyId)}
+              >
                 <PlusIcon size="16" className="mr-2" />
                 Add Step
               </Button>
@@ -173,25 +81,22 @@ export default function JourneyView() {
                     step={step}
                     index={index}
                     isDragging={activeId === step.id}
-                    onUpdateDescription={(idx, val) =>
-                      onUpdateStepAttribute(idx, "description", val)
+                    onDeleteStep={() =>
+                      deleteStep({
+                        stepId: step.id,
+                        journeyId: journeyId,
+                      })
                     }
-                    onUpdateService={(idx, val) =>
-                      onUpdateStepAttribute(idx, "services", val)
-                    }
-                    onUpdateInsight={(idx, val) =>
-                      onUpdateStepAttribute(idx, "insights", val)
-                    }
-                    onUpdatePainPoint={(idx, val) =>
-                      onUpdateStepAttribute(idx, "pains", val)
-                    }
-                    onDeleteStep={onDeleteStep}
-                    onUpdateStepName={onUpdateStepName}
+                    journeyId={journeyId}
                   />
                 </Reorder.Item>
               ))}
               <div className="px-2 py-1.5 shrink-0">
-                <Button variant="outline" size="icon-sm" onClick={AddStep}>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  onClick={() => addStep(journeyId)}
+                >
                   <span className="sr-only">Add Step</span>
                   <PlusIcon size="16" />
                 </Button>

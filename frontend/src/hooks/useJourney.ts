@@ -1,12 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 import {
   fetchJourneyById,
   updateJourney,
   deleteJourney,
   restoreJourney,
 } from "@/api/journeys";
-import type { UserJourney, Step } from "@shared/types";
+import type { UserJourney } from "@shared/types";
 import { toast } from "sonner";
+import { createStep, deleteStep } from "@/api/steps";
 
 export default function useJourney(journeyId: string) {
   const queryClient = useQueryClient();
@@ -17,63 +19,29 @@ export default function useJourney(journeyId: string) {
   });
 
   const updateJourneyMutation = useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       id,
       updates,
-      stepId,
-      attribute,
-      newValue,
     }: {
       id: string;
-      updates?: { name?: string; description?: string };
-      stepId?: string;
-      attribute?: string;
-      newValue?: string;
-    }) => {
-      if (stepId && attribute && newValue !== undefined) {
-        const currentJourney = queryClient.getQueryData<UserJourney>([
-          "journey",
-          id,
-        ]);
-        if (!currentJourney) {
-          throw new Error("Journey not found in cache");
-        }
-
-        const currentSteps = (
-          typeof currentJourney.steps === "string"
-            ? JSON.parse(currentJourney.steps)
-            : currentJourney.steps
-        ) as Step[];
-
-        const updatedSteps = currentSteps.map((step: Step) => {
-          if ((step as Step).id === stepId) {
-            if (attribute === "description") {
-              return { ...step, description: newValue };
-            } else if (step.attributes && attribute) {
-              return {
-                ...step,
-                attributes: { ...step.attributes, [attribute]: newValue },
-              };
-            }
-          }
-          return step;
-        });
-
-        return updateJourney(id, { steps: JSON.stringify(updatedSteps) });
-      } else if (updates) {
-        return updateJourney(id, updates);
-      }
-      throw new Error("Invalid update parameters");
-    },
+      updates: {
+        name?: string;
+        description?: string;
+        stepOrder?: string[];
+      };
+    }) => updateJourney(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
+    },
+    onError: (error) => {
+      toast.error("Failed to update journey: " + error.message);
     },
   });
 
   const deleteJourneyMutation = useMutation({
     mutationFn: (id: string) => deleteJourney(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ["journeys"] }); // Invalidate all journeys to remove the deleted one
+      queryClient.invalidateQueries({ queryKey: ["journey"] }); // Invalidate all journeys to remove the deleted one
       toast.success("Journey deleted successfully!", {
         action: {
           label: "Undo",
@@ -87,13 +55,42 @@ export default function useJourney(journeyId: string) {
     mutationFn: (id: string) => restoreJourney(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
-      queryClient.invalidateQueries({ queryKey: ["journeys"] });
+      queryClient.invalidateQueries({ queryKey: ["journey"] });
       toast.success("Journey restored successfully!");
     },
   });
 
-  return {
-    journey: data
+  const handleCreateStep = useMutation({
+    mutationFn: (journeyId: string) => createStep(journeyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
+    },
+    onError: (error) => {
+      toast.error("Failed to create a step: " + error.message);
+    },
+  });
+
+  const handleDeleteStep = useMutation({
+    mutationFn: ({
+      journeyId,
+      stepId,
+    }: {
+      journeyId: string;
+      stepId: string;
+    }) => deleteStep(journeyId, stepId),
+    onSuccess: () => {
+      console.log("Deleted step");
+      queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
+    },
+    onError: (error) => {
+      toast.error("Failed to delete step: " + error.message);
+    },
+  });
+
+  const memoizedJourney = useMemo(() => {
+    console.log("Recalculating journeys date in useMemo");
+    console.log("data is changed to:", data);
+    return data
       ? {
           ...data,
           steps:
@@ -101,11 +98,17 @@ export default function useJourney(journeyId: string) {
               ? JSON.parse(data.steps)
               : data.steps,
         }
-      : undefined,
+      : undefined;
+  }, [data]);
+
+  return {
+    journey: memoizedJourney,
     loading: isLoading,
     error: error ? true : false,
     updateJourney: updateJourneyMutation.mutate,
     deleteJourney: deleteJourneyMutation.mutate,
     restoreJourney: restoreJourneyMutation.mutate,
+    addStep: handleCreateStep.mutate,
+    deleteStep: handleDeleteStep.mutate,
   };
 }
