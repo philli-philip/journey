@@ -78,7 +78,8 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
                     'services', s.services,
                     'pains', s.painPoints,
                     'insights', s.insights
-                  )
+                  ),
+                  'imageId', s.imageId
                 )
               )
             FROM

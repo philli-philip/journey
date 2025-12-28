@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import journeyRoutes from "./routes/journeyRoutes";
 import stepRoutes from "./routes/stepRoutes";
+import imageRoutes from "./routes/imageRoutes";
 
 const fastify = Fastify({
   logger: true,
@@ -14,6 +15,7 @@ fastify.register(cors, {
 
 fastify.register(journeyRoutes);
 fastify.register(stepRoutes);
+fastify.register(imageRoutes);
 
 const start = async () => {
   try {

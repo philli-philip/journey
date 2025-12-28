@@ -1,7 +1,17 @@
 import { cn } from "@/lib/utils";
 import React, { useState, useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { uploadImage, deleteImage } from "../../api/images";
+import { Button } from "../ui/button";
+import { Trash } from "lucide-react";
 
-export function ImageCell({ img, stepId }: { img?: string; stepId: string }) {
+export function ImageCell({
+  imageId,
+  stepId,
+}: {
+  imageId?: string;
+  stepId: string;
+}) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,10 +46,33 @@ export function ImageCell({ img, stepId }: { img?: string; stepId: string }) {
     }
   };
 
+  const queryClient = useQueryClient();
+
+  const uploadImageMutation = useMutation({
+    mutationFn: ({ file, stepId }: { file: File; stepId: string }) =>
+      uploadImage(file, stepId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["journey"],
+      });
+    },
+  });
+
+  const deleteImageMutation = useMutation({
+    mutationFn: (imageId: string) => deleteImage(imageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["journey"] });
+    },
+  });
+
   const handleUpload = (files: FileList) => {
-    console.log("Files to upload:", files);
-    // For now, just print to the terminal.
-    // In a real application, you would handle the file upload here.
+    if (files.length > 0) {
+      uploadImageMutation.mutate({ file: files[0], stepId });
+    }
+  };
+
+  const handleDelete = (imageId: string) => {
+    deleteImageMutation.mutate(imageId);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,12 +99,23 @@ export function ImageCell({ img, stepId }: { img?: string; stepId: string }) {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      {img ? (
-        <img
-          src={img}
-          alt=""
-          className="object-cover w-full h-full absolute inset-0"
-        />
+      {imageId ? (
+        <div className="relative group">
+          <img
+            src={`${import.meta.env.VITE_API_BASE_URL}/images/${imageId}`}
+            alt={""}
+            className="object-cover w-full h-full p-1 rounded-md"
+          />
+          <Button
+            onClick={() => handleDelete(imageId)}
+            variant="outline"
+            size="icon-sm"
+            className="absolute top-2 right-2 hidden group-hover:flex"
+          >
+            <span className="sr-only">Delete image</span>
+            <Trash size="16" />
+          </Button>
+        </div>
       ) : (
         <>
           {isDragging ? (

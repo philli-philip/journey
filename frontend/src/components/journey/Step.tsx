@@ -113,7 +113,7 @@ export default function StepComponent({
 
       {/* Image section - fixed height 120px */}
       <Cell open={!isImageCollapsed} height="h-30">
-        <ImageCell img={step.img} stepId={step.id} />
+        <ImageCell imageId={step.imageId} stepId={step.id} />
       </Cell>
 
       {/* Description section*/}

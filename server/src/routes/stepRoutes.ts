@@ -23,18 +23,24 @@ export default async function stepRoutes(fastify: FastifyInstance) {
     });
 
     // Fetch the current orderedStepIds from the journey
-    const journey = await new Promise<any>((resolve, reject) => {
-      db.get(
-        "SELECT orderedStepIds FROM user_journeys WHERE id = ?",
-        [journeyId],
-        (err, row) => {
-          if (err) {
-            return reject(err);
+    interface JourneyOrderedSteps {
+      orderedStepIds: string;
+    }
+
+    const journey = await new Promise<JourneyOrderedSteps | undefined>(
+      (resolve, reject) => {
+        db.get(
+          "SELECT orderedStepIds FROM user_journeys WHERE id = ?",
+          [journeyId],
+          (err, row: JourneyOrderedSteps | undefined) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(row);
           }
-          resolve(row);
-        }
-      );
-    });
+        );
+      }
+    );
 
     let orderedStepIds: string[] = [];
     if (journey && journey.orderedStepIds) {
@@ -139,9 +145,9 @@ export default async function stepRoutes(fastify: FastifyInstance) {
         db.run(
           `
       DELETE from steps
-      WHERE id = ?
+      WHERE id = ? AND journeyId = ?
       `,
-          [stepId],
+          [stepId, journeyId],
           function (err) {
             if (err) {
               return reject(err);

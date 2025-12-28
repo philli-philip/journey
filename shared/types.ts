@@ -9,7 +9,7 @@ export interface Step {
   id: string;
   name: string;
   description: string;
-  img: string;
+  imageId: string;
   attributes: Record<Dimension["slug"], string>;
 }
 
