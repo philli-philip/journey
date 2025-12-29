@@ -10,27 +10,27 @@ export const LayerPanel = () => {
     {
       key: "image",
       label: "Image",
-      expandedHeight: "h-30",
+      expandedHeight: "h-42",
     },
     {
       key: "description",
       label: "Description",
-      expandedHeight: "h-20",
+      expandedHeight: "h-30",
     },
     {
       key: "painPoints",
       label: "Pain Points",
-      expandedHeight: "h-20",
+      expandedHeight: "h-30",
     },
     {
       key: "insights",
       label: "Insights",
-      expandedHeight: "h-20",
+      expandedHeight: "h-30",
     },
     {
       key: "services",
       label: "Services",
-      expandedHeight: "h-20",
+      expandedHeight: "h-30",
     },
   ];
 

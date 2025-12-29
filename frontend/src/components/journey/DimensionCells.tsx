@@ -88,7 +88,7 @@ export function ImageCell({
   return (
     <div
       className={cn(
-        "relative flex flex-1 justify-center rounded-lg transition-all duration-200 ease-in-out",
+        "relative flex flex-1 justify-center rounded-lg m-1 transition-all duration-200 ease-in-out",
 
         isDragging
           ? "border-blue-500 bg-blue-100"
@@ -100,11 +100,11 @@ export function ImageCell({
       onDrop={handleDrop}
     >
       {imageId ? (
-        <div className="relative group">
+        <div className="relative group aspect-video w-full items-center flex flex-col">
           <img
             src={`${import.meta.env.VITE_API_BASE_URL}/images/${imageId}`}
             alt={""}
-            className="object-cover w-full h-full p-1 rounded-md"
+            className="object-contain max-h-full border rounded-sm"
           />
           <Button
             onClick={() => handleDelete(imageId)}
@@ -121,7 +121,7 @@ export function ImageCell({
           {isDragging ? (
             <p className="text-gray-500 flex items-center">Drop Image Here</p>
           ) : (
-            <div className="border-2 border-dashed m-2 rounded-lg justify-center hidden text-center group-hover:flex flex-col flex-1">
+            <div className="border-2 border-dashed rounded-lg justify-center hidden text-center group-hover:flex flex-col flex-1">
               <p className="text-gray-500">Click to upload or drag and drop</p>
               <button
                 onClick={openFileBrowser}

@@ -36,6 +36,7 @@ export const CREATE_IMAGES_TABLE = `
     mimeType TEXT NOT NULL,
     size INTEGER NOT NULL,
     altText TEXT,
+    originalImage BLOB NOT NULL,
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL

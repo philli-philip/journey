@@ -112,7 +112,7 @@ export default function StepComponent({
       </div>
 
       {/* Image section - fixed height 120px */}
-      <Cell open={!isImageCollapsed} height="h-30">
+      <Cell open={!isImageCollapsed} height="h-42">
         <ImageCell imageId={step.imageId} stepId={step.id} />
       </Cell>
 
@@ -166,7 +166,7 @@ export default function StepComponent({
 function Cell({
   children,
   open,
-  height = "h-20",
+  height = "h-30",
 }: {
   children: JSX.Element;
   open: boolean;

@@ -4,6 +4,7 @@ import { randomID } from "@shared/randomID";
 import db from "../db";
 import multipart from "@fastify/multipart";
 import { Multipart } from "@fastify/multipart";
+import sharp from "sharp";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -26,6 +27,8 @@ export default async function imageRoutes(fastify: FastifyInstance) {
     let altText: string | undefined;
     let requestId: string | undefined;
     let imageData: Buffer | undefined;
+    let finalMimeType = "image/jpeg";
+    let processedImage: Buffer | undefined;
 
     try {
       const parts = request.parts();
@@ -33,6 +36,15 @@ export default async function imageRoutes(fastify: FastifyInstance) {
         if (part.type === "file") {
           file = part;
           imageData = await file.toBuffer(); // Consume the file stream here
+
+          processedImage = await sharp(imageData)
+            .resize(1600, 1600, {
+              withoutEnlargement: true, // Don't upscale smaller images
+              fit: "inside", // Maintain aspect ratio
+            })
+            .jpeg({ quality: 85 }) // Convert to JPEG with good quality
+            .toBuffer();
+          finalMimeType = "image/jpeg";
         } else {
           if (part.fieldname === "stepId") {
             stepId = part.value as string;
@@ -63,12 +75,13 @@ export default async function imageRoutes(fastify: FastifyInstance) {
 
     return new Promise((resolve, reject) => {
       db.run(
-        "INSERT INTO images (id, imageData, filename, mimeType, size, altText) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO images (id, imageData, originalImage, filename, mimeType, size, altText) VALUES (?, ?, ?, ?, ?, ?,?)",
         [
           imageId,
+          processedImage,
           imageData,
           file.filename,
-          file.mimetype,
+          finalMimeType,
           file.file.bytesRead,
           altText,
         ],

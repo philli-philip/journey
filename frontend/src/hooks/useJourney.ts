@@ -88,8 +88,6 @@ export default function useJourney(journeyId: string) {
   });
 
   const memoizedJourney = useMemo(() => {
-    console.log("Recalculating journeys date in useMemo");
-    console.log("data is changed to:", data);
     return data
       ? {
           ...data,

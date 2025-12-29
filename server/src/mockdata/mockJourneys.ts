@@ -31,7 +31,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s0",
         name: "landing page",
         description: "Welcome to the onboarding process.",
-        img: "https://img.icons8.com/ios/50/000000/landing-page.png",
         attributes: {
           pains: "No account to start with",
           insights: "Users want to sign up easily",
@@ -42,7 +41,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s1",
         name: "Sign Up",
         description: "User creates an account.",
-        img: "https://img.icons8.com/ios/50/000000/sign-up.png",
         attributes: {
           pains: "Difficulty with complex forms",
           insights: "Users prefer social login",
@@ -53,7 +51,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s2",
         name: "Profile Creation",
         description: "User fills out their profile information.",
-        img: "https://img.icons8.com/ios/50/000000/profile.png",
         attributes: {
           pains: "Unsure what information is required",
           insights: "Progress bar helps completion",
@@ -73,7 +70,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s3",
         name: "Browse Products",
         description: "User views product listings.",
-        img: "https://img.icons8.com/ios/50/000000/browse.png",
         attributes: {
           pains: "Overwhelmed by choices",
           insights: "Personalized recommendations increase engagement",
@@ -84,7 +80,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s4",
         name: "Add to Cart",
         description: "User adds items to the shopping cart.",
-        img: "https://img.icons8.com/ios/50/000000/add-to-cart.png",
         attributes: {
           pains: "Unclear shipping costs",
           insights: "Displaying total cost upfront reduces abandonment",
@@ -95,7 +90,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s5",
         name: "Checkout",
         description: "User completes the purchase.",
-        img: "https://img.icons8.com/ios/50/000000/checkout.png",
         attributes: {
           pains: "Long checkout process",
           insights: "Guest checkout option improves conversion",
@@ -115,7 +109,7 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s6",
         name: "Access Help Center",
         description: "User navigates to the help or support section.",
-        img: "https://img.icons8.com/ios/50/000000/help.png",
+
         attributes: {
           pains: "Difficulty finding relevant articles",
           insights: "Search functionality is crucial for self-service",
@@ -126,7 +120,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s7",
         name: "Submit Ticket",
         description: "User submits a support request.",
-        img: "https://img.icons8.com/ios/50/000000/ticket.png",
         attributes: {
           pains: "Long wait times for response",
           insights:
@@ -138,7 +131,6 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s8",
         name: "Receive Resolution",
         description: "User gets a solution to their problem.",
-        img: "https://img.icons8.com/ios/50/000000/solution.png",
         attributes: {
           pains: "Unresolved issues or multiple interactions",
           insights:
