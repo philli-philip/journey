@@ -2,27 +2,30 @@ import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import InsightList from "@/components/InsightList";
 import { getColumns } from "@/components/insights-columns";
+import { useQuery } from "@tanstack/react-query";
+import type { Insight } from "@shared/types";
+import { getAllInsights } from "@/api/insights";
+import { Empty, EmptyTitle } from "@/components/ui/empty";
 
 export default function InsightsPage() {
-  const mockInsights = [
-    {
-      id: "1",
-      title: "Insight 1: Users prefer dark mode",
-      description: "Description for insight 1",
-    },
-    {
-      id: "2",
-      title: "Insight 2: High bounce rate on checkout page",
-      description: "Description for insight 2",
-    },
-    {
-      id: "3",
-      title: "Insight 3: New feature X is popular",
-      description: "Description for insight 3",
-    },
-  ];
-
   const columns = getColumns();
+
+  const { data, isLoading, error } = useQuery<Insight[]>({
+    queryKey: ["insights"],
+    queryFn: getAllInsights,
+  });
+
+  if (isLoading) {
+    return <div>Loading insights...</div>;
+  }
+
+  if (error) {
+    return (
+      <Empty>
+        <EmptyTitle>Error loading insights.</EmptyTitle>
+      </Empty>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1">
@@ -31,11 +34,9 @@ export default function InsightsPage() {
           <SidebarTrigger />
         </Button>
         <h1 className="font-semibold flex-1">Insights</h1>
-        <Button size="sm">
-          New Insight
-        </Button>
+        <Button size="sm">New Insight</Button>
       </div>
-      <InsightList columns={columns} data={mockInsights} />
+      <InsightList columns={columns} data={data || []} />
     </div>
   );
 }

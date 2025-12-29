@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import journeyRoutes from "./routes/journeyRoutes";
 import stepRoutes from "./routes/stepRoutes";
+import insightRoutes from "./routes/insightRoutes";
 import imageRoutes from "./routes/imageRoutes";
 import fastifySchedule from "@fastify/schedule";
 import { ImageCleanUpCron } from "./controllers/ImageCleanUp";
@@ -17,6 +18,7 @@ fastify.register(cors, {
 
 fastify.register(journeyRoutes);
 fastify.register(stepRoutes);
+fastify.register(insightRoutes);
 fastify.register(imageRoutes);
 fastify.register(fastifySchedule);
 

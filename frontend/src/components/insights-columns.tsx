@@ -1,10 +1,5 @@
+import type { Insight } from "@shared/types";
 import type { ColumnDef } from "@tanstack/react-table";
-
-export type Insight = {
-  id: string;
-  title: string;
-  description: string;
-};
 
 export const getColumns = (): ColumnDef<Insight>[] => {
   return [
