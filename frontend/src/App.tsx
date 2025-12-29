@@ -6,6 +6,7 @@ import UserJourneys from "./pages/UserJourneys.tsx";
 import JourneyView from "./pages/JourneySteps.tsx";
 import ViewLayout from "./components/layouts/Viewdetail.tsx";
 import JourneyOverview from "./pages/JourneyOverview.tsx";
+import InsightsPage from "./pages/InsightsPage.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route element={<SideNavigationLayout />}>
             <Route path="/" element={<UserJourneys />} />
+            <Route path="/insights" element={<InsightsPage />} />
             <Route path="journey" element={<ViewLayout />}>
               <Route path=":journeyId/overview" element={<JourneyOverview />} />
               <Route path=":journeyId/steps?" element={<JourneyView />} />

@@ -18,10 +18,10 @@ export default function JourneyView() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (journey?.steps) {
+    if (journey?.steps && JSON.stringify(journey.steps) !== JSON.stringify(steps)) {
       setSteps(journey.steps);
     }
-  }, [journey?.steps]);
+  }, [journey?.steps, steps]);
 
   if (loading) {
     return <div>Loading journey...</div>;

@@ -42,3 +42,28 @@ export const CREATE_IMAGES_TABLE = `
     deletedAt TEXT DEFAULT NULL
   )
 `;
+
+export const CREATE_INSIGHTS_TABLE = `
+  CREATE TABLE IF NOT EXISTS insights (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT DEFAULT 'New Insight',
+    description TEXT,
+    type TEXT CHECK ( type IN ('pain', 'gain', 'need', 'observation')) NOT NULL,
+    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    deletedAt TEXT DEFAULT NULL
+  )
+`;
+
+export const CREATE_STEP_CONNECTIONS_TABLE = `
+  CREATE TABLE IF NOT EXISTS step_connections (
+    id TEXT PRIMARY KEY NOT NULL,
+    stepId TEXT NOT NULL,
+    attributeId TEXT NOT NULL,
+    attributeType TEXT NO NULL CHECK ( attributeType in ('insight')) DEFAULT 'insight',
+    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    deletedAt TEXT DEFAULT NULL,
+    FOREIGN KEY (stepId) REFERENCES steps(id)
+  )
+
+`;

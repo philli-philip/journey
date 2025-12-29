@@ -46,7 +46,7 @@ export default function StepComponent({
   const [services, setServices] = useState(step.attributes.services || "");
 
   const stepMutation = useMutation({
-    mutationFn: (update: Object) => updateStep(journeyId, step.id, update),
+    mutationFn: (update: object) => updateStep(journeyId, step.id, update),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
       console.log("cleared and set");

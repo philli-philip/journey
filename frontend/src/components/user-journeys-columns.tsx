@@ -1,4 +1,4 @@
-import { type ColumnDef, type RowData } from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { type UserJourney } from "@shared/types";
 import { ArrowUpDown, MoreVerticalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,16 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-
-import "@tanstack/react-table"; //or vue, svelte, solid, qwik, etc.
-
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    style: {
-      textAlign: "left" | "center" | "right";
-    };
-  }
-}
 
 export const getColumns = ({
   deleteJourney,

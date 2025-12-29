@@ -22,3 +22,13 @@ export interface UserJourney {
   updatedAt: string;
   deletedAt?: string;
 }
+
+export interface Insight {
+  id: string;
+  title: string;
+  description?: string;
+  type: "pain" | "gain" | "need" | "observation";
+  createdAt: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}

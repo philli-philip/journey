@@ -3,6 +3,7 @@
 ## Components
 
 ### User journey
+
 - ID: ShortID
 - Name: A unique name for the user journey.
 - Description: A detailed description of the user journey. short support Markdown
@@ -12,19 +13,26 @@
 - DeletedAt: The timestamp when the user journey was deleted.
 
 ### Step
+
 - id: ShortID
 - name: A unique name for the step.
 - Dimensions: A list of dimensions for the step.
-    - description: A detailed description of the step. short support Markdown
+  - description: A detailed description of the step. short support Markdown
 
-### Dimension
+# Dimensions
+
+## base attributes
+
 - id: ShortID
 - name: A unique name for the dimension.
 - description: A detailed description of the dimension. short support Markdown
-- Type: The type of the dimension. Can be one of the following. In the future the type should be extenable as it makes the system more flexible and powerful.
-    - Text
-    - Number
-    - Image
+- createdAt, updatedAt, deletedAt
+
+## Insights
+
+Insights can be small snippets about a producct, user, market.
+An insight can be linked to multiple steps.
 
 ### Utilities
+
 - ShortID: Is a unique identifier for identiying any object. Created with NanoID or any other unique identifier generator.

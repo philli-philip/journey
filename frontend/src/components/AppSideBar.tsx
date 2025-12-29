@@ -15,6 +15,11 @@ const Navigation = [
     name: "User Journeys",
     path: "/",
   },
+  {
+    id: "in1",
+    name: "Insights",
+    path: "/insights",
+  },
 ];
 
 export default function AppSideBar() {
