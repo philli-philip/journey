@@ -22,13 +22,17 @@ export async function getInsight(id: string) {
   return response.json();
 }
 
-export async function createInsight() {
+export async function createInsight(form: {
+  title: string;
+  type: string;
+  description: string;
+}) {
   const response = await fetch(`${API_BASE_URL}/insights`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify(form),
   });
 
   if (!response.ok) {
@@ -70,6 +74,5 @@ export async function deleteInsight(insightId: string) {
     const errorData = await response.json();
     throw new Error(errorData.message || "Failed to delete insight");
   }
-
   return response.json();
 }

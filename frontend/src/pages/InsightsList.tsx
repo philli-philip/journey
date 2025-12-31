@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Insight } from "@shared/types";
 import { getAllInsights } from "@/api/insights";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
+import CreateInsightDrawer from "@/components/insights/createInsightDrawer";
 
 export default function InsightsPage() {
   const columns = getColumns();
@@ -34,7 +35,7 @@ export default function InsightsPage() {
           <SidebarTrigger />
         </Button>
         <h1 className="font-semibold flex-1">Insights</h1>
-        <Button size="sm">New Insight</Button>
+        <CreateInsightDrawer />
       </div>
       <InsightList columns={columns} data={data || []} />
     </div>

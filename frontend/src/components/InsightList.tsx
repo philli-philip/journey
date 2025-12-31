@@ -3,16 +3,12 @@ import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Input } from "./ui/input";
+import { Empty, EmptyTitle } from "./ui/empty";
 
 interface InsightListProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -30,6 +26,7 @@ export default function InsightList<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       rowSelection,
     },
@@ -37,26 +34,21 @@ export default function InsightList<TData, TValue>({
 
   return (
     <div className="flex-1 overflow-auto">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter names..."
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            table.getColumn("title")?.setFilterValue(event.target.value)
+          }
+          className="max-w-2xs shadow-none ml-2"
+        />
+      </div>
       <Table className="min-w-full divide-y divide-gray-200">
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
+        <TableBody
+          className="border-t border-b data-[empty=true]:border-b-0"
+          data-empty={table.getRowModel().rows?.length === 0}
+        >
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
@@ -71,10 +63,12 @@ export default function InsightList<TData, TValue>({
               </TableRow>
             ))
           ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
+            <TableRow className="hover:bg-transparent">
+              <td>
+                <Empty>
+                  <EmptyTitle>No insights yet</EmptyTitle>
+                </Empty>
+              </td>
             </TableRow>
           )}
         </TableBody>

@@ -6,7 +6,7 @@ import UserJourneys from "./pages/UserJourneys.tsx";
 import JourneyView from "./pages/JourneySteps.tsx";
 import ViewLayout from "./components/layouts/Viewdetail.tsx";
 import JourneyOverview from "./pages/JourneyOverview.tsx";
-import InsightsPage from "./pages/InsightsPage.tsx";
+import InsightsPage from "./pages/InsightsList.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 

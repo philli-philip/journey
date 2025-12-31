@@ -6,7 +6,7 @@ export default async function insightRoutes(fastify: FastifyInstance) {
   fastify.get("/insights", async (request, reply) => {
     return new Promise((resolve, reject) => {
       db.all(
-        "SELECT * FROM insights WHERE deletedAt IS NULL",
+        "SELECT * FROM insights WHERE deletedAt IS NULL ORDER BY updatedAt DESC",
         [],
         function (this, err, rows) {
           console.log(this, err);
@@ -28,16 +28,20 @@ export default async function insightRoutes(fastify: FastifyInstance) {
       type: string;
     };
 
+    console.log(title, description, type);
     db.run(
       "INSERT INTO insights (id, title, description, type) VALUES (?, ?, ?, ?)",
       [id, title, description, type],
       function (this, err) {
         if (err) {
-          return reply.code(500).send({ message: "Error creating insight" });
+          throw new Error("Error creating insight");
         }
-        return reply.code(201).send(this);
+        console.log("this:", this);
+        reply.status(201);
+        return { id, title, description, type };
       }
     );
+    return { id: title, description, type };
   });
 
   fastify.put("/insights/:id", async (request, reply) => {
@@ -90,7 +94,7 @@ export default async function insightRoutes(fastify: FastifyInstance) {
     db.run(
       "UPDATE insights SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?",
       [id],
-      function (err) {
+      function (this, err) {
         if (err) {
           return reply
             .code(500)
@@ -99,10 +103,10 @@ export default async function insightRoutes(fastify: FastifyInstance) {
         if (this.changes === 0) {
           return reply.code(404).send({ message: "Insight not found" });
         }
-        return reply
-          .code(200)
-          .send({ message: "Insight soft-deleted successfully" });
       }
     );
+    return reply
+      .code(200)
+      .send({ message: "Insight soft-deleted successfully" });
   });
 }

@@ -23,11 +23,15 @@ export interface UserJourney {
   deletedAt?: string;
 }
 
+export const InsightTypes = ["pain", "gain", "need", "observation"] as const;
+
+export type InsightTypes = (typeof InsightTypes)[number];
+
 export interface Insight {
   id: string;
   title: string;
   description?: string;
-  type: "pain" | "gain" | "need" | "observation";
+  type: InsightTypes;
   createdAt: string;
   updatedAt?: string;
   deletedAt?: string;
