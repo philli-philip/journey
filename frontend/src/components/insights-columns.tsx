@@ -11,7 +11,9 @@ import { MoreVerticalIcon } from "lucide-react";
 import { deleteInsight } from "@/api/insights";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const getColumns = (): ColumnDef<Insight>[] => [
+export const getColumns = (
+  query: ReturnType<typeof useQueryClient>
+): ColumnDef<Insight>[] => [
   {
     accessorKey: "title",
     header: "Title",
@@ -19,6 +21,11 @@ export const getColumns = (): ColumnDef<Insight>[] => [
       const insight = row.original;
       return <div className="font-semibold">{insight.title}</div>;
     },
+  },
+  {
+    accessorKey: "id",
+    header: "ID",
+    enableHiding: false,
   },
   {
     accessorKey: "type",
@@ -33,7 +40,6 @@ export const getColumns = (): ColumnDef<Insight>[] => [
     header: "Actions",
     cell: ({ row }) => {
       const insight = row.original;
-      const query = useQueryClient();
       return (
         <DropdownMenu>
           <DropdownMenuTrigger className="z-10">

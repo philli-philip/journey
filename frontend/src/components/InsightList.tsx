@@ -5,10 +5,13 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Input } from "./ui/input";
 import { Empty, EmptyTitle } from "./ui/empty";
+import { useNavigate } from "react-router-dom";
+import UpdateInsightDrawer from "./insights/updateInsightDrawer";
 
 interface InsightListProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -20,6 +23,10 @@ export default function InsightList<TData, TValue>({
   data,
 }: InsightListProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    id: false,
+  });
+  const router = useNavigate();
 
   const table = useReactTable({
     data,
@@ -27,8 +34,10 @@ export default function InsightList<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       rowSelection,
+      columnVisibility,
     },
   });
 
@@ -54,6 +63,10 @@ export default function InsightList<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                onClick={() =>
+                  router(`?panel=insight&id=${row.getValue("id")}`)
+                }
+                className="cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
@@ -73,6 +86,7 @@ export default function InsightList<TData, TValue>({
           )}
         </TableBody>
       </Table>
+      <UpdateInsightDrawer />
     </div>
   );
 }

@@ -3,20 +3,32 @@ import db from "../db";
 import { randomID } from "@shared/randomID";
 
 export default async function insightRoutes(fastify: FastifyInstance) {
-  fastify.get("/insights", async (request, reply) => {
-    return new Promise((resolve, reject) => {
-      db.all(
-        "SELECT * FROM insights WHERE deletedAt IS NULL ORDER BY updatedAt DESC",
-        [],
-        function (this, err, rows) {
-          console.log(this, err);
-          if (err) {
-            reply.code(500).send({ message: "Error fetching insights" });
-            reject(err);
-          }
-          resolve(rows);
+  fastify.get("/insights", (request, reply) => {
+    db.all(
+      "SELECT * FROM insights WHERE deletedAt IS NULL ORDER BY updatedAt DESC",
+      [],
+      function (this, err, rows) {
+        console.log(this, err);
+        if (err) {
+          return reply.code(500).send({ message: "Error fetching insights" });
         }
-      );
+        reply.send(rows);
+      }
+    );
+  });
+
+  fastify.get("/insights/:id", (request, reply) => {
+    const { id } = request.params as { id: string };
+    db.get("SELECT * FROM insights WHERE id = ?", [id], function (err, row) {
+      if (err) {
+        console.error("Database error:", err);
+        return reply.code(500).send({ error: "Internal Server Error" });
+      }
+      if (!row) {
+        return reply.code(404).send({ error: "Insight not found" });
+      }
+      console.log(row);
+      reply.send(row);
     });
   });
 
@@ -44,7 +56,7 @@ export default async function insightRoutes(fastify: FastifyInstance) {
     return { id: title, description, type };
   });
 
-  fastify.put("/insights/:id", async (request, reply) => {
+  fastify.put("/insights/:id", (request, reply) => {
     const { id } = request.params as { id: string };
     const { title, description, type } = request.body as {
       title?: string;
@@ -69,8 +81,7 @@ export default async function insightRoutes(fastify: FastifyInstance) {
     }
 
     if (fields.length === 0) {
-      reply.code(400).send({ message: "No fields provided to update" });
-      return;
+      return reply.code(400).send({ message: "No fields provided to update" });
     }
 
     db.run(
@@ -84,7 +95,9 @@ export default async function insightRoutes(fastify: FastifyInstance) {
             .code(500)
             .send({ message: "Error updating insight" + err.message });
         }
-        reply.code(200).send({ message: "Insight updated successfully" });
+        return reply
+          .code(200)
+          .send({ message: "Insight updated successfully" });
       }
     );
   });

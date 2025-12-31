@@ -1,3 +1,5 @@
+import type { Insight } from "@shared/types";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function getAllInsights() {
@@ -11,7 +13,7 @@ export async function getAllInsights() {
   return response.json();
 }
 
-export async function getInsight(id: string) {
+export async function getInsight(id: string): Promise<Insight | undefined> {
   const response = await fetch(`${API_BASE_URL}/insights/${id}`);
 
   if (!response.ok) {
@@ -46,7 +48,9 @@ export async function createInsight(form: {
 export async function updateInsight(
   insightId: string,
   insightData: {
-    content?: string;
+    title: string;
+    type: string;
+    description: string;
   }
 ) {
   const response = await fetch(`${API_BASE_URL}/insights/${insightId}`, {

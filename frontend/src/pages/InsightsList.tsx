@@ -2,14 +2,15 @@ import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import InsightList from "@/components/InsightList";
 import { getColumns } from "@/components/insights-columns";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Insight } from "@shared/types";
 import { getAllInsights } from "@/api/insights";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import CreateInsightDrawer from "@/components/insights/createInsightDrawer";
 
 export default function InsightsPage() {
-  const columns = getColumns();
+  const queryClient = useQueryClient();
+  const columns = getColumns(queryClient);
 
   const { data, isLoading, error } = useQuery<Insight[]>({
     queryKey: ["insights"],

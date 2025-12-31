@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   Drawer,
   DrawerClose,
@@ -6,7 +6,6 @@ import {
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "../ui/drawer";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
@@ -24,25 +23,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { createInsight } from "@/api/insights";
-import { useQueryClient } from "@tanstack/react-query";
+import { getInsight, updateInsight } from "@/api/insights";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-export default function CreateInsightDrawer() {
+export default function UpdateInsightDrawer() {
   const [searchParams, setSearchParams] = useSearchParams();
   return (
     <Drawer
       direction="right"
       dismissible={true}
-      open={searchParams.get("panel") === "create-insight"}
+      open={searchParams.get("panel") === "insight"}
     >
-      <DrawerTrigger>
-        <Button asChild size="sm">
-          <Link to="?panel=create-insight">New insight</Link>
-        </Button>
-      </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>New insight</DrawerTitle>
+          <DrawerTitle>Insight</DrawerTitle>
           <DrawerDescription></DrawerDescription>
         </DrawerHeader>
         <DrawerClose asChild>
@@ -55,7 +49,7 @@ export default function CreateInsightDrawer() {
             <X />
           </Button>
         </DrawerClose>
-        <CreateInsightForm />
+        <UpdateInsightForm />
       </DrawerContent>
     </Drawer>
   );
@@ -67,23 +61,30 @@ const formSchema = z.object({
   type: z.enum(InsightTypes),
 });
 
-function CreateInsightForm() {
-  const [, setSearchParams] = useSearchParams();
+function UpdateInsightForm() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const { data, isLoading } = useQuery({
+    queryKey: ["insight", id],
+    queryFn: () => getInsight(id || ""),
+  });
+
+  console.log("insight ID:", id, data, isLoading);
   const query = useQueryClient();
   const form = useForm({
     defaultValues: {
-      title: "",
-      type: "pain",
-      description: "",
+      title: data?.title || "",
+      type: (data?.type as string) || "pain",
+      description: data?.description || "",
     },
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
       console.log(value);
-      const response = await createInsight(value);
+      const response = await updateInsight(data?.id || "", value);
 
-      toast.success("Insight created successfully!");
+      toast.success("Insight updated!");
       setSearchParams({});
       query.invalidateQueries({ queryKey: ["insights"] });
       if (response.ok) {
@@ -112,7 +113,6 @@ function CreateInsightForm() {
                     required
                     name={field.name}
                     value={field.state.value}
-                    autoFocus
                     onBlur={field.handleBlur}
                     aria-disabled={isInvalid}
                     onChange={(e) => field.handleChange(e.target.value)}
@@ -186,9 +186,9 @@ function CreateInsightForm() {
               type="reset"
               onClick={() => setSearchParams({})}
             >
-              Cancel
+              Discard
             </Button>
-            <Button type="submit">Submit</Button>
+            <Button type="submit">Update</Button>
           </Field>
         </FieldGroup>
       </form>
