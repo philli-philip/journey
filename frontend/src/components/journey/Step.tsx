@@ -49,7 +49,6 @@ export default function StepComponent({
     mutationFn: (update: object) => updateStep(journeyId, step.id, update),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
-      console.log("cleared and set");
     },
     onError: (error) => {
       toast.error("Failed to update journey: " + error.message);

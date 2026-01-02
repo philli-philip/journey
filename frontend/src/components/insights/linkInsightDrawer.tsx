@@ -24,7 +24,7 @@ export default function LinkInsightDrawer() {
 
 function LinkInsight({ stepId, type }: { stepId: string; type: InsightTypes }) {
   const [searchValue, setSearchValue] = useState("");
-  const [_searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const params = useParams();
   const queryClient = useQueryClient();
 
@@ -41,8 +41,6 @@ function LinkInsight({ stepId, type }: { stepId: string; type: InsightTypes }) {
       });
     },
   });
-
-  console.log("stepId", stepId);
 
   const handleToggle = (id: string) => {
     insightMutation.mutate(id);

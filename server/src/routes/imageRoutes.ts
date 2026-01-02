@@ -25,7 +25,6 @@ export default async function imageRoutes(fastify: FastifyInstance) {
     let file: MultipartFile | undefined;
     let stepId: string | undefined;
     let altText: string | undefined;
-    let requestId: string | undefined;
     let imageData: Buffer | undefined;
     let finalMimeType = "image/jpeg";
     let processedImage: Buffer | undefined;
@@ -50,8 +49,6 @@ export default async function imageRoutes(fastify: FastifyInstance) {
             stepId = part.value as string;
           } else if (part.fieldname === "altText") {
             altText = part.value as string;
-          } else if (part.fieldname === "requestId") {
-            requestId = part.value as string;
           }
         }
       }

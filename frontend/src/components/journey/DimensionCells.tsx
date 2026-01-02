@@ -155,7 +155,7 @@ export function InsightCell({
   type: InsightTypes;
   items: { id: string; title: string }[];
 }) {
-  const [_searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   return (
     <div
       className={cn(

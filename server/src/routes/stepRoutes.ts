@@ -138,8 +138,6 @@ export default async function stepRoutes(fastify: FastifyInstance) {
       stepId: string;
     };
 
-    console.log("Request to delete step", stepId);
-
     const changes = await new Promise<number>((resolve, reject) => {
       db.run("DELETE from steps WHERE id = ?", [stepId], function (err) {
         if (err) {
@@ -163,8 +161,6 @@ export default async function stepRoutes(fastify: FastifyInstance) {
         stepId: string;
         insightId: string;
       };
-
-      console.log("Request to delete step connections", stepId);
 
       const changes = await new Promise<number>((resolve, reject) => {
         db.run(

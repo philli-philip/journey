@@ -11,7 +11,6 @@ export default async function insightRoutes(fastify: FastifyInstance) {
       } ORDER BY updatedAt DESC`,
       [],
       function (this, err, rows) {
-        console.log(this, err);
         if (err) {
           return reply.code(500).send({ message: "Error fetching insights" });
         }
@@ -24,13 +23,11 @@ export default async function insightRoutes(fastify: FastifyInstance) {
     const { id } = request.params as { id: string };
     db.get("SELECT * FROM insights WHERE id = ?", [id], function (err, row) {
       if (err) {
-        console.error("Database error:", err);
         return reply.code(500).send({ error: "Internal Server Error" });
       }
       if (!row) {
         return reply.code(404).send({ error: "Insight not found" });
       }
-      console.log(row);
       reply.send(row);
     });
   });
@@ -43,7 +40,6 @@ export default async function insightRoutes(fastify: FastifyInstance) {
       type: string;
     };
 
-    console.log(title, description, type);
     db.run(
       "INSERT INTO insights (id, title, description, type) VALUES (?, ?, ?, ?)",
       [id, title, description, type],
@@ -51,7 +47,6 @@ export default async function insightRoutes(fastify: FastifyInstance) {
         if (err) {
           throw new Error("Error creating insight");
         }
-        console.log("this:", this);
         reply.status(201);
         return { id, title, description, type };
       }

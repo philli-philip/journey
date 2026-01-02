@@ -56,7 +56,6 @@ export async function createStep(journeyID: string) {
 }
 
 export async function deleteStep(stepId: string) {
-  console.log();
   const response = await fetch(`${API_BASE_URL}/steps/${stepId}`, {
     method: "DELETE",
   });
@@ -66,7 +65,6 @@ export async function deleteStep(stepId: string) {
     throw new Error(errorData.message || "Failed to create step");
   }
   const data = response.json();
-  console.log(data);
   return data;
 }
 

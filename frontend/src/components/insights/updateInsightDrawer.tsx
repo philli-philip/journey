@@ -64,12 +64,11 @@ const formSchema = z.object({
 function UpdateInsightForm() {
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["insight", id],
     queryFn: () => getInsight(id || ""),
   });
 
-  console.log("insight ID:", id, data, isLoading);
   const query = useQueryClient();
   const form = useForm({
     defaultValues: {
@@ -81,13 +80,13 @@ function UpdateInsightForm() {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
       const response = await updateInsight(data?.id || "", value);
-
-      toast.success("Insight updated!");
-      setSearchParams({});
-      query.invalidateQueries({ queryKey: ["insights"] });
       if (response.ok) {
+        toast.success("Insight updated!");
+        setSearchParams({});
+        query.invalidateQueries({ queryKey: ["insights"] });
+      } else {
+        toast.error("Failed to update insight");
       }
     },
   });

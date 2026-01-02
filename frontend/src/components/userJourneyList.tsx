@@ -87,7 +87,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
                   <TableCell
                     key={cell.id}
                     width={cell.column.columnDef.size}
-                    // @ts-ignore
+                    // @ts-expect-error TODO: Fix type incompatibility
                     align={cell.column.columnDef.meta?.style.textAlign}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -80,13 +80,13 @@ function CreateInsightForm() {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
       const response = await createInsight(value);
-
-      toast.success("Insight created successfully!");
-      setSearchParams({});
-      query.invalidateQueries({ queryKey: ["insights"] });
       if (response.ok) {
+        toast.success("Insight created successfully!");
+        setSearchParams({});
+        query.invalidateQueries({ queryKey: ["insights"] });
+      } else {
+        toast.error("Failed to create insight");
       }
     },
   });

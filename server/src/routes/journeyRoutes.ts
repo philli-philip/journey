@@ -114,15 +114,11 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 
   fastify.put("/journeys/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
-    console.log("Request Body:", request.body);
-    console.log("Content-Type:", request.headers["content-type"]);
     const { name, description, stepOrder } = request.body as {
       name?: string;
       description?: string;
       stepOrder?: string[];
     };
-
-    console.log("stepOrder:", stepOrder);
 
     const fields: string[] = [];
     const values: (string | string[])[] = [];

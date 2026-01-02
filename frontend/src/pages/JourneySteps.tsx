@@ -20,6 +20,10 @@ export default function JourneyView() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
+    async function setSteps(newSteps: Step[]) {
+      setSteps(newSteps);
+    }
+    
     if (
       journey?.steps &&
       JSON.stringify(journey.steps) !== JSON.stringify(steps)
