@@ -60,7 +60,7 @@ export const CREATE_STEP_CONNECTIONS_TABLE = `
     id TEXT PRIMARY KEY NOT NULL,
     stepId TEXT NOT NULL,
     attributeId TEXT NOT NULL,
-    attributeType TEXT NO NULL CHECK ( attributeType in ('insight')) DEFAULT 'insight',
+    attributeType TEXT NO NULL CHECK ( attributeType in ('insight', 'service')) DEFAULT 'insight',
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL,
     FOREIGN KEY (stepId) REFERENCES steps(id)

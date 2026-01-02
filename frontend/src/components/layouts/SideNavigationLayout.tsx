@@ -4,13 +4,11 @@ import AppSideBar from "../AppSideBar";
 
 export default function SideNavigationLayout() {
   return (
-    <div className="flex flex-col flex-1">
-      <SidebarProvider>
-        <AppSideBar />
-        <SidebarInset>
-          <Outlet />
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+    <SidebarProvider>
+      <AppSideBar />
+      <SidebarInset>
+        <Outlet />
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

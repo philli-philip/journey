@@ -10,7 +10,10 @@ export interface Step {
   name: string;
   description: string;
   imageId?: string;
-  attributes: Record<Dimension["slug"], string>;
+  attributes: Record<
+    Dimension["slug"],
+    { id: string; title: string }[] | string
+  >;
 }
 
 export interface UserJourney {
@@ -20,6 +23,15 @@ export interface UserJourney {
   steps: Step[];
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
+}
+
+export interface Connection {
+  id: string;
+  stepId: string;
+  attributeId: string;
+  attributeType: "insight" | "service";
+  createdAt: string;
   deletedAt?: string;
 }
 

@@ -55,14 +55,11 @@ export async function createStep(journeyID: string) {
   return response.json();
 }
 
-export async function deleteStep(journeyId: string, stepId: string) {
+export async function deleteStep(stepId: string) {
   console.log();
-  const response = await fetch(
-    `${API_BASE_URL}/journeys/${journeyId}/steps/${stepId}`,
-    {
-      method: "DELETE",
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/steps/${stepId}`, {
+    method: "DELETE",
+  });
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -71,4 +68,23 @@ export async function deleteStep(journeyId: string, stepId: string) {
   const data = response.json();
   console.log(data);
   return data;
+}
+
+export async function deleteInsightConnection(
+  stepId: string,
+  insightId: string
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/steps/${stepId}/insights/${insightId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to delete insight connection");
+  }
+
+  return response.json();
 }

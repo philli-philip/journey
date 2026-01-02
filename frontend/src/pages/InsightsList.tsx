@@ -14,7 +14,7 @@ export default function InsightsPage() {
 
   const { data, isLoading, error } = useQuery<Insight[]>({
     queryKey: ["insights"],
-    queryFn: getAllInsights,
+    queryFn: () => getAllInsights(),
   });
 
   if (isLoading) {

@@ -71,13 +71,7 @@ export default function useJourney(journeyId: string) {
   });
 
   const handleDeleteStep = useMutation({
-    mutationFn: ({
-      journeyId,
-      stepId,
-    }: {
-      journeyId: string;
-      stepId: string;
-    }) => deleteStep(journeyId, stepId),
+    mutationFn: ({ stepId }: { stepId: string }) => deleteStep(stepId),
     onSuccess: () => {
       console.log("Deleted step");
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });

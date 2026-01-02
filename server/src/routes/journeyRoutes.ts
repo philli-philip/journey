@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import db from "../db";
-import { randomID } from "../../../shared/randomID";
+import { randomID } from "@shared/randomID";
 
 export default async function journeyRoutes(fastify: FastifyInstance) {
   fastify.get("/journeys", async (request, reply) => {
@@ -75,9 +75,11 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
                   'name', s.name,
                   'description', s.description,
                   'attributes', json_object(
-                    'services', s.services,
-                    'pains', s.painPoints,
-                    'insights', s.insights
+                    'services', (SELECT json_group_array(json_object('id', i.id, 'title', i.title, 'description', i.description)) FROM insights i JOIN step_connections sc ON i.id = sc.attributeId WHERE sc.stepId = s.id AND sc.attributeType = 'service' AND i.deletedAt IS NULL),
+                    'pains', (SELECT json_group_array(json_object('id', i.id, 'title', i.title, 'description', i.description)) FROM insights i JOIN step_connections sc ON i.id = sc.attributeId WHERE sc.stepId = s.id AND sc.attributeType = 'insight' AND i.type = 'pain' AND i.deletedAt IS NULL),
+                    'needs', (SELECT json_group_array(json_object('id', i.id, 'title', i.title, 'description', i.description)) FROM insights i JOIN step_connections sc ON i.id = sc.attributeId WHERE sc.stepId = s.id AND sc.attributeType = 'insight' AND i.type = 'need' AND i.deletedAt IS NULL),
+                    'gains', (SELECT json_group_array(json_object('id', i.id, 'title', i.title, 'description', i.description)) FROM insights i JOIN step_connections sc ON i.id = sc.attributeId WHERE sc.stepId = s.id AND sc.attributeType = 'insight' AND i.type = 'gain' AND i.deletedAt IS NULL),
+                    'observations', (SELECT json_group_array(json_object('id', i.id, 'title', i.title, 'description', i.description)) FROM insights i JOIN step_connections sc ON i.id = sc.attributeId WHERE sc.stepId = s.id AND sc.attributeType = 'insight' AND i.type = 'observation' AND i.deletedAt IS NULL)
                   ),
                   'imageId', s.imageId
                 )

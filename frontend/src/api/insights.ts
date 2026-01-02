@@ -1,13 +1,40 @@
-import type { Insight } from "@shared/types";
+import type { Insight, InsightTypes } from "@shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export async function getAllInsights() {
-  const response = await fetch(`${API_BASE_URL}/insights`);
+export async function getAllInsights(filter?: { type?: InsightTypes }) {
+  const response = await fetch(
+    `${API_BASE_URL}/insights${filter?.type ? `?type=${filter.type}` : ""}`
+  );
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "Failed to get insight");
+  }
+
+  return response.json();
+}
+
+export async function linkInsightToStep({
+  id,
+  stepId,
+  type,
+}: {
+  id: string;
+  stepId: string;
+  type: InsightTypes;
+}) {
+  const response = await fetch(`${API_BASE_URL}/connections`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ type, attributeId: id, stepId }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to link insight to step");
   }
 
   return response.json();
