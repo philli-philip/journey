@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, type Location } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -38,6 +38,7 @@ const Logo = ({ size = 24 }: { size?: number }) => (
 );
 
 export default function AppSideBar() {
+  const location:Location = useLocation()
   return (
     <Sidebar variant="sidebar" side="left">
       <SidebarContent>
@@ -50,7 +51,7 @@ export default function AppSideBar() {
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton
                   asChild
-                  isActive={item.path === window.location.pathname}
+                  isActive={item.path === location.pathname}
                 >
                   <Link to={item.path}>{item.name}</Link>
                 </SidebarMenuButton>
