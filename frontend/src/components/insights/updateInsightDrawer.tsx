@@ -1,14 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "../ui/drawer";
 import { Button } from "../ui/button";
-import { X } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import { InsightTypes } from "@shared/types";
@@ -25,33 +16,24 @@ import {
 } from "../ui/select";
 import { getInsight, updateInsight } from "@/api/insights";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import PreparedDrawer from "../layouts/Drawer";
 
 export default function UpdateInsightDrawer() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return null;
+  }
+
   return (
-    <Drawer
-      direction="right"
-      dismissible={true}
+    <PreparedDrawer
+      title="Insight"
       open={searchParams.get("panel") === "insight"}
+      onClose={() => setSearchParams({})}
     >
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Insight</DrawerTitle>
-          <DrawerDescription></DrawerDescription>
-        </DrawerHeader>
-        <DrawerClose asChild>
-          <Button
-            className="absolute top-2 right-2"
-            variant="outline"
-            size="icon"
-            onClick={() => setSearchParams({})}
-          >
-            <X />
-          </Button>
-        </DrawerClose>
-        <UpdateInsightForm />
-      </DrawerContent>
-    </Drawer>
+      <UpdateInsightForm id={id} />
+    </PreparedDrawer>
   );
 }
 
@@ -61,12 +43,11 @@ const formSchema = z.object({
   type: z.enum(InsightTypes),
 });
 
-function UpdateInsightForm() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const id = searchParams.get("id");
+function UpdateInsightForm({ id }: { id: string }) {
+  const [, setSearchParams] = useSearchParams();
   const { data } = useQuery({
     queryKey: ["insight", id],
-    queryFn: () => getInsight(id || ""),
+    queryFn: () => getInsight(id),
   });
 
   const query = useQueryClient();
@@ -90,6 +71,11 @@ function UpdateInsightForm() {
       }
     },
   });
+
+  if (!id) {
+    return null;
+  }
+
   return (
     <>
       <form
