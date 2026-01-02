@@ -42,8 +42,8 @@ export default function InsightList<TData, TValue>({
   });
 
   return (
-    <div className="flex-1 overflow-auto">
-      <div className="flex items-center py-4">
+    <>
+      <div className="flex items-center py-4 border-b">
         <Input
           placeholder="Filter names..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
@@ -53,40 +53,45 @@ export default function InsightList<TData, TValue>({
           className="max-w-2xs shadow-none ml-2"
         />
       </div>
-      <Table className="min-w-full divide-y divide-gray-200">
-        <TableBody
-          className="border-t border-b data-[empty=true]:border-b-0"
-          data-empty={table.getRowModel().rows?.length === 0}
-        >
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                onClick={() =>
-                  router(`?panel=insight&id=${row.getValue("id")}`)
-                }
-                className="cursor-pointer"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      <div className="flex-auto overflow-scroll h-20 flex flex-col">
+        <Table className="min-w-full divide-y divide-gray-200 ">
+          <TableBody
+            className="border-b data-[empty=true]:border-b-0"
+            data-empty={table.getRowModel().rows?.length === 0}
+          >
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={() =>
+                    router(`?panel=insight&id=${row.getValue("id")}`)
+                  }
+                  className="cursor-pointer"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <td>
+                  <Empty>
+                    <EmptyTitle>No insights yet</EmptyTitle>
+                  </Empty>
+                </td>
               </TableRow>
-            ))
-          ) : (
-            <TableRow className="hover:bg-transparent">
-              <td>
-                <Empty>
-                  <EmptyTitle>No insights yet</EmptyTitle>
-                </Empty>
-              </td>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       <UpdateInsightDrawer />
-    </div>
+    </>
   );
 }

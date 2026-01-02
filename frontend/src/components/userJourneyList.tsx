@@ -57,7 +57,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
 
   return (
     <>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 border-b">
         <Input
           placeholder="Filter names..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -67,45 +67,50 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
           className="max-w-2xs shadow-none ml-2"
         />
       </div>
-      <Table
-        className="h-full"
-        data-empty={table.getRowModel().rows?.length === 0}
-      >
-        <TableBody
-          className="border-t border-b data-[empty=true]:border-b-0"
+      <div className="flex-auto overflow-scroll h-20 flex flex-col">
+        <Table
+          className="h-full"
           data-empty={table.getRowModel().rows?.length === 0}
         >
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                onClick={() => router(`/journey/${row.original.id}/steps`)}
-                className="cursor-pointer"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    width={cell.column.columnDef.size}
-                    // @ts-expect-error TODO: Fix type incompatibility
-                    align={cell.column.columnDef.meta?.style.textAlign}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+          <TableBody
+            className="border-b data-[empty=true]:border-b-0"
+            data-empty={table.getRowModel().rows?.length === 0}
+          >
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={() => router(`/journey/${row.original.id}/steps`)}
+                  className="cursor-pointer"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      width={cell.column.columnDef.size}
+                      // @ts-expect-error TODO: Fix type incompatibility
+                      align={cell.column.columnDef.meta?.style.textAlign}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <td>
+                  <Empty>
+                    <EmptyTitle>No journeys yet</EmptyTitle>
+                  </Empty>
+                </td>
               </TableRow>
-            ))
-          ) : (
-            <TableRow className="hover:bg-transparent">
-              <td>
-                <Empty>
-                  <EmptyTitle>No journeys yet</EmptyTitle>
-                </Empty>
-              </td>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </>
   );
 }

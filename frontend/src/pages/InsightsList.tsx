@@ -30,7 +30,7 @@ export default function InsightsPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col h-full">
       <div className="flex flex-row p-1 items-center gap-2 border-b border-border">
         <Button asChild variant="ghost" size="icon">
           <SidebarTrigger />
