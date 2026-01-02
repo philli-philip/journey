@@ -15,7 +15,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Empty, EmptyTitle } from "./ui/empty";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -78,12 +78,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
           >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  onClick={() => router(`/journey/${row.original.id}/steps`)}
-                  className="cursor-pointer"
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
@@ -91,10 +86,15 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
                       // @ts-expect-error TODO: Fix type incompatibility
                       align={cell.column.columnDef.meta?.style.textAlign}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      <Link
+                        to={`/journey/${row.original.id}/steps`}
+                        className="block p-3 cursor-pointer"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </Link>
                     </TableCell>
                   ))}
                 </TableRow>

@@ -47,8 +47,7 @@ export default async function insightRoutes(fastify: FastifyInstance) {
         if (err) {
           throw new Error("Error creating insight");
         }
-        reply.status(201);
-        return { id, title, description, type };
+        reply.status(201).send({ id, title, description, type });
       }
     );
     return { id: title, description, type };

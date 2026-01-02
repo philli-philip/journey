@@ -8,12 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useQueryClient } from "@tanstack/react-query";
+import { deleteJourney } from "@/api/journeys";
 
-export const getColumns = ({
-  deleteJourney,
-}: {
-  deleteJourney: (id: string) => void;
-}): ColumnDef<UserJourney>[] => [
+export const getColumns = (): ColumnDef<UserJourney>[] => [
   {
     accessorKey: "name",
     minSize: 80,
@@ -95,6 +93,7 @@ export const getColumns = ({
     },
     cell: ({ row }) => {
       const journey = row.original;
+      const queryClient = useQueryClient();
 
       return (
         <DropdownMenu>
@@ -102,6 +101,7 @@ export const getColumns = ({
             <Button
               variant="ghost"
               asChild
+              size="icon-sm"
               className="border-transparent hover:border-border border cursor-pointer"
             >
               <div>
@@ -112,9 +112,12 @@ export const getColumns = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={async (event) => {
-                event.preventDefault();
+              onClick={(e) => {
+                e.preventDefault();
                 deleteJourney(journey.id);
+                queryClient.invalidateQueries({
+                  queryKey: ["journeys"],
+                });
               }}
             >
               Delete

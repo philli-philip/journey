@@ -45,6 +45,7 @@ export const getColumns = (
           <DropdownMenuTrigger className="z-10">
             <Button
               variant="ghost"
+              size="icon-sm"
               asChild
               className="border-transparent hover:border-border border cursor-pointer"
             >
