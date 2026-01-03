@@ -55,10 +55,25 @@ export async function createStep(journeyID: string) {
   return response.json();
 }
 
-export async function deleteStep(journeyId: string, stepId: string) {
-  console.log();
+export async function deleteStep(stepId: string) {
+  const response = await fetch(`${API_BASE_URL}/steps/${stepId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to create step");
+  }
+  const data = response.json();
+  return data;
+}
+
+export async function deleteInsightConnection(
+  stepId: string,
+  insightId: string
+) {
   const response = await fetch(
-    `${API_BASE_URL}/journeys/${journeyId}/steps/${stepId}`,
+    `${API_BASE_URL}/steps/${stepId}/insights/${insightId}`,
     {
       method: "DELETE",
     }
@@ -66,9 +81,8 @@ export async function deleteStep(journeyId: string, stepId: string) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to create step");
+    throw new Error(errorData.message || "Failed to delete insight connection");
   }
-  const data = response.json();
-  console.log(data);
-  return data;
+
+  return response.json();
 }

@@ -3,7 +3,9 @@ import React, { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadImage, deleteImage } from "../../api/images";
 import { Button } from "../ui/button";
-import { Trash } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
+import type { InsightTypes } from "@shared/types";
+import { Link, useSearchParams } from "react-router-dom";
 
 export function ImageCell({
   imageId,
@@ -140,6 +142,54 @@ export function ImageCell({
           />
         </>
       )}
+    </div>
+  );
+}
+
+export function InsightCell({
+  stepId,
+  type,
+  items,
+}: {
+  stepId: string;
+  type: InsightTypes;
+  items: { id: string; title: string }[];
+}) {
+  const [, setSearchParams] = useSearchParams();
+  return (
+    <div
+      className={cn(
+        "relative group flex flex-col flex-1 justify-start rounded-lg transition-all duration-200 ease-in-out"
+      )}
+    >
+      {items.length > 0 ? (
+        <div className="flex flex-col gap-0.5 p-1 pr-2 overflow-x-scroll">
+          {items.map((insight) => (
+            <Link
+              to={`?insight=${insight.id}&step=${stepId}`}
+              key={insight.id}
+              className="border rounded-sm px-2 py-1 hover:bg-gray-100"
+            >
+              {insight.title}
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-500 hidden group-hover:flex items-center justify-center flex-1">
+          No {type} yet
+        </p>
+      )}
+      <Button
+        variant="outline"
+        size="icon-sm"
+        className="opacity-0 group-hover:opacity-100 absolute top-1 right-1"
+        onClick={() =>
+          setSearchParams({ action: "add-insight", type, id: stepId })
+        }
+      >
+        <span className="sr-only">Add Insight</span>
+        <Plus size="16" />
+      </Button>
     </div>
   );
 }

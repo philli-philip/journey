@@ -10,7 +10,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import type { Step } from "@shared/types";
 import { cn } from "@/lib/utils";
 import { useGlobalCollapse } from "./GlobalCollapseContext";
-import { ImageCell } from "./DimensionCells";
+import { ImageCell, InsightCell } from "./DimensionCells";
 import { updateStep } from "../../api/steps";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -41,15 +41,14 @@ export default function StepComponent({
   const queryClient = useQueryClient();
   const [name, setName] = useState(step.name || "Step without name");
   const [description, setDescription] = useState(step.description || "");
-  const [pains, setPains] = useState(step.attributes.pains || "");
-  const [insights, setInsights] = useState(step.attributes.insights || "");
-  const [services, setServices] = useState(step.attributes.services || "");
+  const [services, setServices] = useState(
+    typeof step.attributes.services === "string" ? step.attributes.services : ""
+  );
 
   const stepMutation = useMutation({
-    mutationFn: (update: Object) => updateStep(journeyId, step.id, update),
+    mutationFn: (update: object) => updateStep(journeyId, step.id, update),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
-      console.log("cleared and set");
     },
     onError: (error) => {
       toast.error("Failed to update journey: " + error.message);
@@ -58,9 +57,10 @@ export default function StepComponent({
 
   const isDescriptionCollapsed = globalCollapsedState.description;
   const isPainPointCollapsed = globalCollapsedState.painPoints;
-  const isInsightsCollapsed = globalCollapsedState.insights;
+  const isInsightsCollapsed = globalCollapsedState.observations;
   const isServicesCollapsed = globalCollapsedState.services;
   const isImageCollapsed = globalCollapsedState.image;
+  const isNeedsCollapsed = globalCollapsedState.needs;
 
   return (
     <div
@@ -129,23 +129,36 @@ export default function StepComponent({
 
       {/* Pain Point section*/}
       <Cell open={!isPainPointCollapsed}>
-        <textarea
-          className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={pains || ""}
-          onChange={(e) => setPains(e.target.value)}
-          onBlur={(e) => stepMutation.mutate({ pains: e.target.value })}
-          disabled={isPainPointCollapsed}
+        <InsightCell
+          stepId={step.id}
+          type="pain"
+          items={
+            step.attributes.pains instanceof Array ? step.attributes.pains : []
+          }
         />
       </Cell>
 
       {/* Insights section*/}
       <Cell open={!isInsightsCollapsed}>
-        <textarea
-          className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={insights || ""}
-          onChange={(e) => setInsights(e.target.value)}
-          onBlur={(e) => stepMutation.mutate({ insights: e.target.value })}
-          disabled={isInsightsCollapsed}
+        <InsightCell
+          stepId={step.id}
+          type="observation"
+          items={
+            step.attributes.observations instanceof Array
+              ? step.attributes.observations
+              : []
+          }
+        />
+      </Cell>
+
+      {/* Needs section*/}
+      <Cell open={!isNeedsCollapsed}>
+        <InsightCell
+          stepId={step.id}
+          type="need"
+          items={
+            step.attributes.needs instanceof Array ? step.attributes.needs : []
+          }
         />
       </Cell>
 
@@ -153,7 +166,7 @@ export default function StepComponent({
       <Cell open={!isServicesCollapsed}>
         <textarea
           className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
-          value={services || ""}
+          value={services}
           onChange={(e) => setServices(e.target.value)}
           onBlur={(e) => stepMutation.mutate({ services: e.target.value })}
           disabled={isServicesCollapsed}
@@ -166,7 +179,7 @@ export default function StepComponent({
 function Cell({
   children,
   open,
-  height = "h-30",
+  height = "h-60",
 }: {
   children: JSX.Element;
   open: boolean;

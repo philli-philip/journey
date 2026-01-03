@@ -15,35 +15,40 @@ export const LayerPanel = () => {
     {
       key: "description",
       label: "Description",
-      expandedHeight: "h-30",
+      expandedHeight: "h-60",
     },
     {
       key: "painPoints",
       label: "Pain Points",
-      expandedHeight: "h-30",
+      expandedHeight: "h-60",
     },
     {
-      key: "insights",
-      label: "Insights",
-      expandedHeight: "h-30",
+      key: "observations",
+      label: "Observations",
+      expandedHeight: "h-60",
+    },
+    {
+      key: "needs",
+      label: "Needs",
+      expandedHeight: "h-60",
     },
     {
       key: "services",
       label: "Services",
-      expandedHeight: "h-30",
+      expandedHeight: "h-60",
     },
   ];
 
   return (
-    <div className="sticky divide-y left-0 top-0 w-72 z-10 text-base text-secondary-foreground">
-      <div className="pr-2 pl-4 h-12 pt-3">
+    <div className="divide-y flex flex-col w-56 h-fit text-base text-secondary-foreground">
+      <div className="pr-2 pl-4 h-12 pt-3 shrink-0">
         <span>Steps</span>
       </div>
       {sections.map((section) => (
         <div
           key={section.key}
           className={cn(
-            "flex flex-row justify-between items-start pr-2 pl-4 pt-2 duration-300 ease-in-out",
+            "flex flex-row justify-between items-start grow-0 shrink-0 pr-2 pl-4 pt-2 duration-300 ease-in-out",
             globalCollapsedState[section.key] ? "h-12" : section.expandedHeight
           )}
         >

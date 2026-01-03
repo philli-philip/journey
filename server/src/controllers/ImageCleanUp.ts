@@ -1,7 +1,7 @@
 import db from "src/db";
 import { AsyncTask, CronJob } from "toad-scheduler";
 
-const imageCleanUp = new AsyncTask("simple task", async (taskId) => {
+const imageCleanUp = new AsyncTask("simple task", async () => {
   console.log("start image clean up. Deleting old images.");
   db.run(
     "DELETE FROM images WHERE (unixepoch(CURRENT_TIMESTAMP) - unixepoch(deletedAt)) > ?",

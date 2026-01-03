@@ -64,8 +64,8 @@ export default function ViewLayout() {
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <header className="flex flex-col">
+    <>
+      <header className="flex flex-col w-full">
         <div className="flex items-center h-12 gap-2 px-3 border-b">
           <Button
             asChild
@@ -135,6 +135,6 @@ export default function ViewLayout() {
         </div>
       </header>
       <Outlet />
-    </div>
+    </>
   );
 }

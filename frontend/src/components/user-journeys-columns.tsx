@@ -1,29 +1,10 @@
-import { type ColumnDef, type RowData } from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { type UserJourney } from "@shared/types";
-import { ArrowUpDown, MoreVerticalIcon } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+import { ActionCell } from "./journey/tabelCells";
 
-import "@tanstack/react-table"; //or vue, svelte, solid, qwik, etc.
-
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    style: {
-      textAlign: "left" | "center" | "right";
-    };
-  }
-}
-
-export const getColumns = ({
-  deleteJourney,
-}: {
-  deleteJourney: (id: string) => void;
-}): ColumnDef<UserJourney>[] => [
+export const useJourneyColumns = (): ColumnDef<UserJourney>[] => [
   {
     accessorKey: "name",
     minSize: 80,
@@ -103,35 +84,6 @@ export const getColumns = ({
         textAlign: "right",
       },
     },
-    cell: ({ row }) => {
-      const journey = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger className="z-10">
-            <Button
-              variant="ghost"
-              asChild
-              className="border-transparent hover:border-border border cursor-pointer"
-            >
-              <div>
-                <span className="sr-only">actions</span>
-                <MoreVerticalIcon size={12} />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={async (event) => {
-                event.preventDefault();
-                deleteJourney(journey.id);
-              }}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ActionCell,
   },
 ];

@@ -10,7 +10,10 @@ export interface Step {
   name: string;
   description: string;
   imageId?: string;
-  attributes: Record<Dimension["slug"], string>;
+  attributes: Record<
+    Dimension["slug"],
+    { id: string; title: string }[] | string
+  >;
 }
 
 export interface UserJourney {
@@ -20,5 +23,28 @@ export interface UserJourney {
   steps: Step[];
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
+}
+
+export interface Connection {
+  id: string;
+  stepId: string;
+  attributeId: string;
+  attributeType: "insight" | "service";
+  createdAt: string;
+  deletedAt?: string;
+}
+
+export const InsightTypes = ["pain", "gain", "need", "observation"] as const;
+
+export type InsightTypes = (typeof InsightTypes)[number];
+
+export interface Insight {
+  id: string;
+  title: string;
+  description?: string;
+  type: InsightTypes;
+  createdAt: string;
+  updatedAt?: string;
   deletedAt?: string;
 }

@@ -133,21 +133,39 @@ export default async function stepRoutes(fastify: FastifyInstance) {
     return reply.code(200).send({ message: "Step updated successfully" });
   });
 
+  fastify.delete("/steps/:stepId", async (request, reply) => {
+    const { stepId } = request.params as {
+      stepId: string;
+    };
+
+    const changes = await new Promise<number>((resolve, reject) => {
+      db.run("DELETE from steps WHERE id = ?", [stepId], function (err) {
+        if (err) {
+          return reject(err);
+        }
+        resolve(this.changes);
+      });
+    });
+    if (changes === 0) {
+      return reply.code(404).send({
+        message: "Step not found or does not belong to the specified journey",
+      });
+    }
+    return reply.code(200).send({ message: "Step deleted successfully" });
+  });
+
   fastify.delete(
-    "/journeys/:journeyId/steps/:stepId",
+    "/steps/:stepId/insights/:insightId",
     async (request, reply) => {
-      const { journeyId, stepId } = request.params as {
-        journeyId: string;
+      const { stepId, insightId } = request.params as {
         stepId: string;
+        insightId: string;
       };
 
       const changes = await new Promise<number>((resolve, reject) => {
         db.run(
-          `
-      DELETE from steps
-      WHERE id = ? AND journeyId = ?
-      `,
-          [stepId, journeyId],
+          "DELETE from step_connections WHERE stepId = ? AND attributeID = ?",
+          [stepId, insightId],
           function (err) {
             if (err) {
               return reject(err);
@@ -158,10 +176,13 @@ export default async function stepRoutes(fastify: FastifyInstance) {
       });
       if (changes === 0) {
         return reply.code(404).send({
-          message: "Step not found or does not belong to the specified journey",
+          message:
+            "Step connections not found or does not belong to the specified step",
         });
       }
-      return reply.code(200).send({ message: "Step deleted successfully" });
+      return reply
+        .code(200)
+        .send({ message: "Step connections deleted successfully" });
     }
   );
 }

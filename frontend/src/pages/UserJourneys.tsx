@@ -1,16 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { getColumns } from "@/components/user-journeys-columns";
+import { useJourneyColumns } from "@/components/user-journeys-columns";
 import UserJourneyList from "@/components/userJourneyList";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import useAllJourneys from "@/hooks/useAllJourneys";
-import useJourney from "@/hooks/useJourney"; // Import useJourney to get mutations
 import { useNavigate } from "react-router-dom";
 
 export default function UserJourneys() {
   const { journeys, loading, error, createJourney } = useAllJourneys();
-  const { deleteJourney } = useJourney(""); // Pass an empty string or a dummy ID, as we only need the mutations here
   const navigate = useNavigate();
+  const columns = useJourneyColumns();
 
   const handleCreateJourney = async () => {
     const newJourney = await createJourney();
@@ -30,8 +29,6 @@ export default function UserJourneys() {
       </Empty>
     );
   }
-
-  const columns = getColumns({ deleteJourney });
 
   return (
     <div className="flex flex-col flex-1">
