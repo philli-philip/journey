@@ -1,17 +1,10 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { type UserJourney } from "@shared/types";
-import { ArrowUpDown, MoreVerticalIcon } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { useQueryClient } from "@tanstack/react-query";
-import { deleteJourney } from "@/api/journeys";
+import { ActionCell } from "./journey/tabelCells";
 
-export const getColumns = (): ColumnDef<UserJourney>[] => [
+export const useJourneyColumns = (): ColumnDef<UserJourney>[] => [
   {
     accessorKey: "name",
     minSize: 80,
@@ -91,40 +84,6 @@ export const getColumns = (): ColumnDef<UserJourney>[] => [
         textAlign: "right",
       },
     },
-    cell: ({ row }) => {
-      const journey = row.original;
-      const queryClient = useQueryClient();
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger className="z-10">
-            <Button
-              variant="ghost"
-              asChild
-              size="icon-sm"
-              className="border-transparent hover:border-border border cursor-pointer"
-            >
-              <div>
-                <span className="sr-only">actions</span>
-                <MoreVerticalIcon size={12} />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.preventDefault();
-                deleteJourney(journey.id);
-                queryClient.invalidateQueries({
-                  queryKey: ["journeys"],
-                });
-              }}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ActionCell,
   },
 ];
