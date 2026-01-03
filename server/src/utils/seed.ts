@@ -2,12 +2,14 @@ import db from "../db";
 import { mockUserJourneys } from "../mockdata/mockJourneys";
 import { mockInsights } from "../mockdata/mockInsights";
 import { mockConnections } from "../mockdata/mockConnections";
+import { mockPersona } from "src/mockdata/mockPersona";
 
 db.serialize(() => {
   console.log("Seeding database ...");
   db.run("DELETE FROM user_journeys"); // Clear existing data
   db.run("DELETE FROM insights"); // Clear existing data
   db.run("DELETE FROM step_connections"); // Clear existing data
+  db.run("DELETE FROM personas"); // Clear existing data
 
   const stmtJourneys = db.prepare(
     "INSERT INTO user_journeys (id, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)"
@@ -55,6 +57,16 @@ db.serialize(() => {
   });
 
   stmtConnections.finalize();
+
+  const stmtPersonas = db.prepare(
+    "INSERT INTO personas (slug, name, description) VALUES (?, ?, ?)"
+  );
+
+  mockPersona.forEach((persona) => {
+    stmtPersonas.run(persona.slug, persona.name, persona.description);
+  });
+
+  stmtPersonas.finalize();
 
   console.log("Database seeded successfully.");
 });

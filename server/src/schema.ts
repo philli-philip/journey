@@ -64,6 +64,16 @@ export const CREATE_STEP_CONNECTIONS_TABLE = `
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL,
     FOREIGN KEY (stepId) REFERENCES steps(id)
-  )
+)
+`;
 
+export const CREATE_PERSONA_TABLE = `
+  CREATE TABLE IF NOT EXISTS personas (
+    slug TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL DEFAULT 'New Persona' ,
+    description TEXT,
+    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    deletedAt TEXT DEFAULT NULL
+  )
 `;

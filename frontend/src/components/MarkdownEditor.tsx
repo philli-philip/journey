@@ -2,25 +2,29 @@ import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
-import Placeholder from "@tiptap/extension-placeholder";
+import Placeholder, {
+  type PlaceholderOptions,
+} from "@tiptap/extension-placeholder";
 
 interface MarkdownEditorProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  placeholder?: PlaceholderOptions["placeholder"];
 }
 
 const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   value,
   onChange,
   className,
+  placeholder = "Add a description...",
 }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
       Markdown,
       Placeholder.configure({
-        placeholder: "Write a description for your journey...",
+        placeholder,
       }),
     ],
     content: value,

@@ -45,6 +45,15 @@ export interface Insight {
   description?: string;
   type: InsightTypes;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
+
+export interface Persona {
+  slug: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
   deletedAt?: string;
 }

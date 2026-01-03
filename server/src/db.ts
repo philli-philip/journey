@@ -5,6 +5,7 @@ import {
   CREATE_IMAGES_TABLE,
   CREATE_INSIGHTS_TABLE,
   CREATE_STEP_CONNECTIONS_TABLE,
+  CREATE_PERSONA_TABLE,
 } from "./schema";
 
 const db = new sqlite3.Database("./journey.db", (err) => {
@@ -17,6 +18,7 @@ const db = new sqlite3.Database("./journey.db", (err) => {
     db.run(CREATE_IMAGES_TABLE);
     db.run(CREATE_INSIGHTS_TABLE);
     db.run(CREATE_STEP_CONNECTIONS_TABLE);
+    db.run(CREATE_PERSONA_TABLE);
   }
 });
 

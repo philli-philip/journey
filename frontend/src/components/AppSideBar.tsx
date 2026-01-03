@@ -20,6 +20,11 @@ const Navigation = [
     name: "Insights",
     path: "/insights",
   },
+  {
+    id: "pe1",
+    name: "Personas",
+    path: "/personas",
+  },
 ];
 
 const Logo = ({ size = 24 }: { size?: number }) => (
@@ -38,7 +43,7 @@ const Logo = ({ size = 24 }: { size?: number }) => (
 );
 
 export default function AppSideBar() {
-  const location:Location = useLocation()
+  const location: Location = useLocation();
   return (
     <Sidebar variant="sidebar" side="left">
       <SidebarContent>

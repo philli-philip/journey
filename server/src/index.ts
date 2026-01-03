@@ -7,6 +7,7 @@ import imageRoutes from "./routes/imageRoutes";
 import fastifySchedule from "@fastify/schedule";
 import { ImageCleanUpCron } from "./controllers/ImageCleanUp";
 import stepConnectionRoutes from "./routes/step_connectionRoutes";
+import personaRoutes from "./routes/personaRoutes";
 
 const fastify = Fastify({
   logger: true,
@@ -23,6 +24,7 @@ fastify.register(insightRoutes);
 fastify.register(imageRoutes);
 fastify.register(fastifySchedule);
 fastify.register(stepConnectionRoutes);
+fastify.register(personaRoutes);
 
 fastify.ready().then(() => {
   fastify.scheduler.addCronJob(ImageCleanUpCron);

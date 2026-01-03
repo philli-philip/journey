@@ -9,6 +9,10 @@ import JourneyOverview from "./pages/JourneyOverview.tsx";
 import InsightsPage from "./pages/InsightsList.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
+import PersonaList from "./pages/personas/personaList.tsx";
+import PersonaDetails from "./pages/personas/personaDetails.tsx";
+import PersonaLayout from "./pages/personas/personasLayout.tsx";
+import PersonaJourneys from "./pages/personas/personaJourneys.tsx";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +24,15 @@ function App() {
           <Route element={<SideNavigationLayout />}>
             <Route path="/" element={<UserJourneys />} />
             <Route path="/insights" element={<InsightsPage />} />
+            <Route path="/personas" element={<PersonaList />} />
+            <Route path="/personas/:slug" element={<PersonaLayout />}>
+              <Route path="overview" element={<PersonaDetails />} />
+              <Route path="journeys" element={<PersonaJourneys />} />
+            </Route>
+            <Route
+              path="/personas/:slug/overview"
+              element={<PersonaDetails />}
+            />
             <Route path="journey" element={<ViewLayout />}>
               <Route path=":journeyId/overview" element={<JourneyOverview />} />
               <Route path=":journeyId/steps?" element={<JourneyView />} />
