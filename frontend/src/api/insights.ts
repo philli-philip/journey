@@ -1,6 +1,5 @@
 import type { Insight, InsightTypes } from "@shared/types";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL } from "@shared/constants";
 
 export async function getAllInsights(filter?: { type?: InsightTypes }) {
   const response = await fetch(

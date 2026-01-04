@@ -12,7 +12,8 @@
     "frontend:check": "cd frontend && npm run check",
     "backend:lint": "cd server && npm run lint",
     "backend:check": "cd server && npm run check",
-    "seed": "cd server && npm run seed"
+    "seed": "cd server && npm run seed",
+    "postinstall": "(cd server && npm i); (cd frontend && npm i)"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

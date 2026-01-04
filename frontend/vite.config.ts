@@ -2,11 +2,12 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { APP_PORT } from "../shared/constants";
 
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    port: 3000,
+    port: APP_PORT,
   },
   plugins: [react(), tailwindcss()],
   resolve: {

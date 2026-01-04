@@ -1,6 +1,5 @@
+import { API_BASE_URL } from "@shared/constants";
 import type { updateJourneyDto } from "@shared/Dto/journey.types";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function fetchAllJourneys() {
   const response = await fetch(`${API_BASE_URL}/journeys`);
