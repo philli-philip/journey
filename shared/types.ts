@@ -24,6 +24,10 @@ export interface UserJourney {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  personas: {
+    slug: string;
+    name: string;
+  }[];
 }
 
 export interface Connection {

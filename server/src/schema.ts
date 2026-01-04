@@ -1,8 +1,9 @@
 export const CREATE_USER_JOURNEYS_TABLE = `
   CREATE TABLE IF NOT EXISTS user_journeys (
-    id TEXT PRIMARY KEY,
+    id TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
+    personas TEXT DEFAULT '[]',
     orderedStepIds TEXT DEFAULT '[]',
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,

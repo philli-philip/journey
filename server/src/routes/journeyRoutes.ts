@@ -1,6 +1,9 @@
 import { FastifyInstance } from "fastify";
 import db from "../db";
 import { randomID } from "@shared/randomID";
+import type { updateJourneyDto } from "@shared/Dto/journey.types";
+import { buildFieldValueClause } from "src/utils/sql-helper";
+import { UserJourney } from "@shared/types";
 
 export default async function journeyRoutes(fastify: FastifyInstance) {
   fastify.get("/journeys", async (request, reply) => {
@@ -67,6 +70,7 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
           uj.updatedAt AS updatedAt,
           uj.deletedAt AS deletedAt,
           uj.orderedStepIds AS orderedStepIds,
+          (SELECT json_group_array(json_object('slug', p.slug, 'name', p.name)) FROM json_each(uj.personaSlugs) AS je JOIN personas p ON p.slug = je.value AND p.deletedAt IS NULL) AS personas,
           (
             SELECT
               json_group_array(
@@ -98,7 +102,7 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
         WHERE
           uj.id = ?`,
         [id],
-        (err, row) => {
+        (err, row: { personas: string; steps: string }) => {
           if (err) {
             reply.code(500).send({ message: "Error fetching journey" });
             reject(err);
@@ -106,70 +110,41 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
           if (!row) {
             return reply.code(404).send({ message: "Journey not found" });
           }
+          // Parse JSON strings into objects
+          if (row.personas) {
+            row.personas = JSON.parse(row.personas);
+          }
+          if (row.steps) {
+            row.steps = JSON.parse(row.steps);
+          }
           return reply.code(200).send(row);
         }
       );
     });
   });
 
-  fastify.put("/journeys/:id", async (request, reply) => {
+  fastify.put("/journeys/:id", (request, reply) => {
     const { id } = request.params as { id: string };
-    const { name, description, stepOrder } = request.body as {
-      name?: string;
-      description?: string;
-      stepOrder?: string[];
-    };
+    const updates = request.body as updateJourneyDto["updates"];
 
-    const fields: string[] = [];
-    const values: (string | string[])[] = [];
+    const { fields: personaFields, values: personaValues } =
+      buildFieldValueClause({
+        updates,
+        updatedAt: true,
+      });
 
-    if (name !== undefined) {
-      fields.push("name = ?");
-      values.push(name);
-    }
-    if (description !== undefined) {
-      fields.push("description = ?");
-      values.push(description);
-    }
-
-    if (stepOrder !== undefined) {
-      fields.push("orderedStepIds = ?");
-      if (Array.isArray(stepOrder)) {
-        values.push(JSON.stringify(stepOrder));
-      } else if (typeof stepOrder === "string") {
-        values.push(stepOrder);
-      } else {
-        // Handle unexpected type, perhaps log an error or send a bad request response
-        fastify.log.warn("Unexpected type for stepOrder: " + typeof stepOrder);
-        reply.code(400).send({ message: "Invalid type for stepOrder" });
-        return;
-      }
-      fastify.log.info({ stepOrder });
-    }
-
-    if (fields.length === 0) {
-      reply.code(400).send({ message: "No fields provided to update" });
-      return;
-    }
-
-    return new Promise((resolve, reject) => {
-      db.run(
-        `UPDATE user_journeys SET ${fields.join(
-          ", "
-        )}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`,
-        [...values, id],
-        function (err) {
-          if (err) {
-            reply
-              .code(500)
-              .send({ message: "Error updating journey" + err.message });
-            reject(err);
-          }
-          reply.code(200).send({ message: "Journey updated successfully" });
-          resolve({ message: "Journey updated successfully" });
+    db.run(
+      `UPDATE user_journeys SET ${personaFields}, updatedAt = CURRENT_TIMESTAMP WHERE id = ? RETURNING *`,
+      [...personaValues, id],
+      function (err) {
+        if (err) {
+          reply
+            .code(500)
+            .send({ message: "Error updating journey" + err.message });
         }
-      );
-    });
+        reply.code(200).send("Journey updated successfully");
+      }
+    );
   });
 
   fastify.delete("/journeys/:id", async (request, reply) => {

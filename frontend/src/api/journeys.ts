@@ -1,3 +1,5 @@
+import type { updateJourneyDto } from "@shared/Dto/journey.types";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function fetchAllJourneys() {
@@ -29,21 +31,18 @@ export async function fetchJourneyById(id: string) {
   return data;
 }
 
-export async function updateJourney(
-  id: string,
-  updates: { name?: string; description?: string; steps?: string }
-) {
-  const response = await fetch(`${API_BASE_URL}/journeys/${id}`, {
+export async function updateJourney(data: updateJourneyDto) {
+  const response = await fetch(`${API_BASE_URL}/journeys/${data.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(updates),
+    body: JSON.stringify(data.updates),
   });
   if (!response.ok) {
-    throw new Error(`Failed to update journey with id ${id}`);
+    throw new Error(`Failed to update journey with id ${data.id}`);
   }
-  return { id };
+  return { id: data.id };
 }
 export async function deleteJourney(id: string) {
   const response = await fetch(`${API_BASE_URL}/journeys/${id}`, {

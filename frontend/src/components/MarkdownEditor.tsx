@@ -33,7 +33,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: "prose dark:prose-invert min-h-[200px] p-4 focus:outline-none",
+        class:
+          "prose dark:prose-invert prose-sm max-w-full min-h-[200px] p-4 focus:outline-none",
       },
     },
   });

@@ -29,7 +29,7 @@ export default function PersonaDetails() {
       <MarkdownEditor
         value={persona.description || ""}
         onChange={handleDescriptionChange}
-        className="mx-auto max-w-4xl p-0 w-full overflow-scroll bg-card rounded-md shadow-sm"
+        className="mx-auto max-w-4xl p-0 w-full bg-card rounded-md shadow-sm"
         placeholder="Add a description for your persona..."
       />
     </div>

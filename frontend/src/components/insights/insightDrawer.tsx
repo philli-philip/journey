@@ -17,6 +17,7 @@ export default function InsightDetails() {
   const { data: insight } = useQuery({
     queryKey: ["insight", insightId],
     queryFn: () => getInsight(insightId || ""),
+    enabled: !!insightId,
   });
 
   const { mutate } = useMutation({

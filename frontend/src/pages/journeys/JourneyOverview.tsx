@@ -2,6 +2,7 @@ import { Empty, EmptyTitle } from "@/components/ui/empty";
 import useJourney from "@/hooks/useJourney";
 import { useParams } from "react-router-dom";
 import MarkdownEditor from "@/components/MarkdownEditor";
+import DetailBox from "@/components/journey/detailBox";
 
 export default function JourneyOverview() {
   const journeyId = useParams().journeyId;
@@ -44,10 +45,13 @@ export default function JourneyOverview() {
   };
 
   return (
-    <MarkdownEditor
-      value={journey.description || ""}
-      onChange={handleDescriptionChange}
-      className="mx-auto max-w-4xl p-4 w-full"
-    />
+    <div className="bg-neutral-100 pt-4 grow h-10 px-4 pb-24 overflow-x-scroll flex flex-row gap-4 justify-center">
+      <MarkdownEditor
+        value={journey.description || ""}
+        onChange={handleDescriptionChange}
+        className="max-w-4xl grow h-fit bg-card rounded-md shadow-sm"
+      />
+      <DetailBox journey={journey} />
+    </div>
   );
 }

@@ -59,7 +59,7 @@ export default function JourneyView() {
               setSteps(newOrder);
               updateJourney({
                 id: journey.id,
-                updates: { stepOrder: newOrder.map((step) => step.id) },
+                updates: { orderedStepIds: newOrder.map((step) => step.id) },
               });
             }}
             className="flex gap-1 h-fit flex-row items-stretch overflow-x-scroll flex-1 overflow-y-hidden pb-4"

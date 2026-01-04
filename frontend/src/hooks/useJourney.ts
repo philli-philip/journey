@@ -9,6 +9,7 @@ import {
 import type { UserJourney } from "@shared/types";
 import { toast } from "sonner";
 import { createStep, deleteStep } from "@/api/steps";
+import type { updateJourneyDto } from "@shared/Dto/journey.types";
 
 export default function useJourney(journeyId: string) {
   const queryClient = useQueryClient();
@@ -19,17 +20,8 @@ export default function useJourney(journeyId: string) {
   });
 
   const updateJourneyMutation = useMutation({
-    mutationFn: ({
-      id,
-      updates,
-    }: {
-      id: string;
-      updates: {
-        name?: string;
-        description?: string;
-        stepOrder?: string[];
-      };
-    }) => updateJourney(id, updates),
+    mutationFn: ({ id, updates }: updateJourneyDto) =>
+      updateJourney({ id, updates }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journey", journeyId] });
     },
