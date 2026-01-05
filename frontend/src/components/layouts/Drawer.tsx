@@ -8,13 +8,14 @@ import {
 } from "../ui/drawer";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 export default function PreparedDrawer({
   title = "New drawer",
   description,
   children,
   open = false,
-  onClose = () => {},
+  onClose,
 }: {
   title?: string;
   description?: string;
@@ -22,6 +23,7 @@ export default function PreparedDrawer({
   open?: boolean;
   onClose?: () => void;
 }) {
+  const [, setSearchParams] = useSearchParams();
   return (
     <Drawer direction="right" dismissible={true} open={open}>
       <DrawerContent>
@@ -34,7 +36,7 @@ export default function PreparedDrawer({
             className="absolute top-2 right-2"
             variant="outline"
             size="icon"
-            onClick={onClose}
+            onClick={() => (onClose ? onClose() : setSearchParams({}))}
           >
             <X />
           </Button>
