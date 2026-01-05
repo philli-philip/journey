@@ -1,5 +1,6 @@
 import type { Insight, InsightTypes } from "@shared/types";
 import { API_BASE_URL } from "@shared/constants";
+import type { updateInsightDto } from "@shared/Dto/insight.types";
 
 export async function getAllInsights(filter?: { type?: InsightTypes }) {
   const response = await fetch(
@@ -71,27 +72,19 @@ export async function createInsight(form: {
   return response.json();
 }
 
-export async function updateInsight(
-  insightId: string,
-  insightData: {
-    title: string;
-    type: string;
-    description: string;
-  }
-) {
-  const response = await fetch(`${API_BASE_URL}/insights/${insightId}`, {
+export async function updateInsight(insight: updateInsightDto) {
+  const response = await fetch(`${API_BASE_URL}/insights/${insight.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(insightData),
+    body: JSON.stringify(insight.updates),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "Failed to update insight");
   }
-
   return response.json();
 }
 

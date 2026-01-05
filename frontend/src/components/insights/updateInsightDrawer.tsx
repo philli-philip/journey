@@ -14,9 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { getInsight, updateInsight } from "@/api/insights";
+import { getInsight } from "@/api/insights";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PreparedDrawer from "../layouts/Drawer";
+import { useUpdateInsightMutation } from "@/hooks/useInsights";
 
 export default function UpdateInsightDrawer() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,12 +46,13 @@ const formSchema = z.object({
 
 function UpdateInsightForm({ id }: { id: string }) {
   const [, setSearchParams] = useSearchParams();
+  const updateInsight = useUpdateInsightMutation();
+  const query = useQueryClient();
   const { data } = useQuery({
     queryKey: ["insight", id],
     queryFn: () => getInsight(id),
   });
 
-  const query = useQueryClient();
   const form = useForm({
     defaultValues: {
       title: data?.title || "",
@@ -61,14 +63,23 @@ function UpdateInsightForm({ id }: { id: string }) {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      const response = await updateInsight(data?.id || "", value);
-      if (response.ok) {
-        toast.success("Insight updated!");
-        setSearchParams({});
-        query.invalidateQueries({ queryKey: ["insights"] });
-      } else {
-        toast.error("Failed to update insight");
-      }
+      updateInsight.mutate(
+        {
+          id,
+          updates: {
+            title: value.title,
+            description: value.description,
+            type: value.type as InsightTypes,
+          },
+        },
+        {
+          onSuccess: () => {
+            toast.success("Insight updated!");
+            setSearchParams({});
+            query.invalidateQueries({ queryKey: ["insights"] });
+          },
+        }
+      );
     },
   });
 
