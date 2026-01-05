@@ -7,6 +7,7 @@ import type { Insight } from "@shared/types";
 import { getAllInsights } from "@/api/insights";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import CreateInsightDrawer from "@/components/insights/createInsightDrawer";
+import { PageTitle } from "@/components/ui/page-title";
 
 export default function InsightsPage() {
   const queryClient = useQueryClient();
@@ -31,6 +32,7 @@ export default function InsightsPage() {
 
   return (
     <div className="flex flex-col h-full">
+      <PageTitle title="Insights" />
       <div className="flex flex-row p-1 items-center gap-2 border-b border-border">
         <Button asChild variant="ghost" size="icon">
           <SidebarTrigger />

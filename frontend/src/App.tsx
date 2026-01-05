@@ -4,7 +4,7 @@ import { SidebarProvider } from "./components/ui/sidebar";
 import { Empty, EmptyTitle } from "./components/ui/empty";
 import UserJourneys from "./pages/journeys/journeyList.tsx";
 import JourneyView from "./pages/journeys/JourneySteps.tsx";
-import ViewLayout from "./components/layouts/Viewdetail.tsx";
+import ViewLayout from "./pages/journeys/journeyLayout.tsx";
 import JourneyOverview from "./pages/journeys/JourneyOverview.tsx";
 import InsightsPage from "./pages/InsightsList.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

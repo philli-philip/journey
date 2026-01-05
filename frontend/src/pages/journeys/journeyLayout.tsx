@@ -1,12 +1,13 @@
 import { NavLink, Outlet, useParams } from "react-router-dom";
-import { Button } from "../ui/button";
-import { SidebarTrigger } from "../ui/sidebar";
+import { Button } from "../../components/ui/button";
+import { SidebarTrigger } from "../../components/ui/sidebar";
 import { ArrowLeftIcon } from "lucide-react";
 import useJourney from "@/hooks/useJourney";
-import { Empty, EmptyTitle } from "../ui/empty";
+import { Empty, EmptyTitle } from "../../components/ui/empty";
 import { useState } from "react";
-import { Input } from "../ui/input";
+import { Input } from "../../components/ui/input";
 import { cn } from "@/lib/utils";
+import { PageTitle } from "../../components/ui/page-title";
 
 const navItems = (journeyId: string) => [
   {
@@ -65,6 +66,7 @@ export default function ViewLayout() {
 
   return (
     <>
+      <PageTitle title={journey.name} />
       <header className="flex flex-col w-full">
         <div className="flex items-center h-12 gap-2 px-3 border-b">
           <Button

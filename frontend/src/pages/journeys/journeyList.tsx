@@ -5,6 +5,7 @@ import UserJourneyList from "@/components/userJourneyList";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import useAllJourneys from "@/hooks/useAllJourneys";
 import { useNavigate } from "react-router-dom";
+import { PageTitle } from "@/components/ui/page-title";
 
 export default function UserJourneys() {
   const { journeys, loading, error, createJourney } = useAllJourneys();
@@ -32,11 +33,12 @@ export default function UserJourneys() {
 
   return (
     <div className="flex flex-col flex-1">
+      <PageTitle title="Journeys" />
       <div className="flex flex-row p-1 items-center gap-2 border-b border-border">
         <Button asChild variant="ghost" size="icon">
           <SidebarTrigger />
         </Button>
-        <h1 className="font-semibold flex-1">User Journeys</h1>
+        <h1 className="font-semibold flex-1">Journeys</h1>
         <Button onClick={handleCreateJourney} size="sm">
           New Journey
         </Button>

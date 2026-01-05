@@ -1,6 +1,7 @@
 import { DetailHeader, HeaderTitle } from "@/components/layouts/blocks/header";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/navTabs";
+import { PageTitle } from "@/components/ui/page-title";
 import { usePersonaQuery } from "@/hooks/usePersona";
 import { ArrowLeft } from "lucide-react";
 import { Link, Outlet, useParams } from "react-router-dom";
@@ -20,6 +21,7 @@ export default function PersonaLayout() {
   return (
     <>
       <DetailHeader>
+        <PageTitle title={persona.name} />
         <Button
           variant="ghost"
           size="sm"
