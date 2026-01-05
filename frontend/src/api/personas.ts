@@ -3,11 +3,10 @@ import type {
   UpdatePersonaDto,
 } from "@shared/Dto/persona.types";
 import type { Persona } from "@shared/types";
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL } from "@shared/constants";
 
 export async function getPersonas() {
-  const response = await fetch(`${baseUrl}/personas`);
+  const response = await fetch(`${API_BASE_URL}/personas`);
   try {
     if (!response.ok) {
       const error = await response.json();
@@ -25,7 +24,7 @@ export async function getPersonas() {
 }
 
 export async function getPersona(slug: string) {
-  const response = await fetch(`${baseUrl}/personas/${slug}`);
+  const response = await fetch(`${API_BASE_URL}/personas/${slug}`);
   try {
     if (!response.ok) {
       const error = await response.json();
@@ -43,7 +42,7 @@ export async function getPersona(slug: string) {
 }
 
 export async function createPersona(persona: CreatePersonaDto) {
-  const response = await fetch(`${baseUrl}/personas`, {
+  const response = await fetch(`${API_BASE_URL}/personas`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -67,7 +66,7 @@ export async function createPersona(persona: CreatePersonaDto) {
 }
 
 export async function deletePersona(id: string) {
-  const response = await fetch(`${baseUrl}/personas/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/personas/${id}`, {
     method: "DELETE",
   });
   try {
@@ -87,7 +86,7 @@ export async function deletePersona(id: string) {
 }
 
 export async function updatePersona(persona: UpdatePersonaDto) {
-  const response = await fetch(`${baseUrl}/personas`, {
+  const response = await fetch(`${API_BASE_URL}/personas`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
