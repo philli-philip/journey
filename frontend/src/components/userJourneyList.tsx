@@ -84,6 +84,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
                       width={cell.column.columnDef.size}
                       // @ts-expect-error TODO: Fix type incompatibility
                       align={cell.column.columnDef.meta?.style.textAlign}
+                      className="p-0"
                     >
                       <Link
                         to={`/journey/${row.original.id}/steps`}
