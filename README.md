@@ -34,3 +34,19 @@ If you want to populate your local database with some initial data, you can use 
 ```bash
 npm run seed
 ```
+
+## Updating Your Project
+
+To get the latest features and bug fixes, navigate to your project directory and run the update script using Node.js:
+
+```bash
+npm run upgrade
+```
+
+This script will:
+
+1. Pull the latest changes from the GitHub repository.
+2. Install/update any necessary npm dependencies.
+3. Inform you when the update is complete.
+
+After running the script, you can restart your development server with `npm run dev` to see the changes.
