@@ -2,10 +2,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchAllJourneys, createJourney } from "@/api/journeys";
 import type { UserJourney } from "@shared/types";
 
-export default function useAllJourneys() {
+export default function useAllJourneys({
+  filter,
+}: {
+  filter: { personaSlug?: string };
+}) {
   const { data, isLoading, error } = useQuery<UserJourney[]>({
-    queryKey: ["journeys"],
-    queryFn: fetchAllJourneys,
+    queryKey: ["journeys", filter],
+    queryFn: () => fetchAllJourneys(filter),
   });
 
   const queryClient = useQueryClient();
@@ -13,7 +17,7 @@ export default function useAllJourneys() {
   const createJourneyMutation = useMutation({
     mutationFn: createJourney,
     onSuccess: (newJourney) => {
-      queryClient.invalidateQueries({ queryKey: ["journeys"] });
+      queryClient.invalidateQueries({ queryKey: ["journeys", filter] });
       return newJourney;
     },
   });

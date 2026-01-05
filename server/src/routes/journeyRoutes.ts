@@ -3,23 +3,24 @@ import db from "../db";
 import { randomID } from "@shared/randomID";
 import type { updateJourneyDto } from "@shared/Dto/journey.types";
 import { buildFieldValueClause } from "src/utils/sql-helper";
-import { UserJourney } from "@shared/types";
 
 export default async function journeyRoutes(fastify: FastifyInstance) {
-  fastify.get("/journeys", async (request, reply) => {
-    return new Promise((resolve, reject) => {
-      db.all(
-        "SELECT * FROM user_journeys WHERE deletedAt IS NULL",
-        [],
-        (err, rows) => {
-          if (err) {
-            reply.code(500).send({ message: "Error fetching journeys" });
-            reject(err);
-          }
-          return reply.status(200).send(rows);
+  fastify.get("/journeys", (request, reply) => {
+    const { personaSlug } = request.query as { personaSlug?: string };
+
+    db.all(
+      `SELECT * FROM user_journeys WHERE deletedAt IS NULL ${
+        personaSlug ? "AND personaSlugs LIKE ?" : ""
+      }`,
+      personaSlug ? [`%${personaSlug}%`] : [],
+      (err, rows) => {
+        if (err) {
+          console.log("Error fetching journeys: ", err);
+          reply.code(500).send({ message: "Error fetching journeys:", err });
         }
-      );
-    });
+        reply.status(200).send(rows);
+      }
+    );
   });
 
   fastify.post("/journeys", async (request, reply) => {

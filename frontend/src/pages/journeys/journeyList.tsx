@@ -8,7 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { PageTitle } from "@/components/ui/page-title";
 
 export default function UserJourneys() {
-  const { journeys, loading, error, createJourney } = useAllJourneys();
+  const { journeys, loading, error, createJourney } = useAllJourneys({
+    filter: {},
+  });
   const navigate = useNavigate();
   const columns = useJourneyColumns();
 

@@ -14,7 +14,6 @@ export default async function stepConnectionRoutes(app: FastifyInstance) {
   });
 
   app.post("/connections", (req, res) => {
-    console.log(req.body);
     const id = randomID();
     const { stepId, type, attributeId } = req.body as {
       stepId: string;

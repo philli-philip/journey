@@ -1,8 +1,8 @@
 import { API_BASE_URL } from "@shared/constants";
 import type { updateJourneyDto } from "@shared/Dto/journey.types";
 
-export async function fetchAllJourneys() {
-  const response = await fetch(`${API_BASE_URL}/journeys`);
+export async function fetchAllJourneys(filter?: { personaSlug?: string }) {
+  const response = await fetch(`${API_BASE_URL}/journeys${filter?.personaSlug ? `?personaSlug=${filter.personaSlug}` : ""}`);
   if (!response.ok) {
     throw new Error("Failed to fetch journeys");
   }

@@ -89,7 +89,6 @@ export default async function personaRoutes(fastify: FastifyInstance) {
       [...values, slug],
       function (this, err) {
         if (err) {
-          console.log(err.message);
           reply.status(500).send({ error: "Internal server error:", err });
         } else if (this.changes === 0) {
           reply.status(404).send({ error: "Persona not found" });
