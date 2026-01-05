@@ -26,6 +26,12 @@ export const mockUserJourneys: UserJourney[] = [
     id: "uj1",
     name: "Onboarding Flow",
     description: "The initial user onboarding process.",
+    personas: [
+      {
+        slug: "admin",
+        name: "Administrator",
+      },
+    ],
     steps: [
       {
         id: "s0",
@@ -65,6 +71,7 @@ export const mockUserJourneys: UserJourney[] = [
     id: "uj2",
     name: "Purchase Process",
     description: "Steps involved in making a purchase.",
+    personas: [],
     steps: [
       {
         id: "s3",
@@ -104,6 +111,7 @@ export const mockUserJourneys: UserJourney[] = [
     id: "uj3",
     name: "Customer Support Interaction",
     description: "Process of a user seeking and receiving support.",
+    personas: [],
     steps: [
       {
         id: "s6",

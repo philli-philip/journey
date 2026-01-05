@@ -3,7 +3,7 @@ export const CREATE_USER_JOURNEYS_TABLE = `
     id TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
-    personas TEXT DEFAULT '[]',
+    personaSlugs TEXT DEFAULT '[]',
     orderedStepIds TEXT DEFAULT '[]',
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,

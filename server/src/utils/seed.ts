@@ -12,7 +12,7 @@ db.serialize(() => {
   db.run("DELETE FROM personas"); // Clear existing data
 
   const stmtJourneys = db.prepare(
-    "INSERT INTO user_journeys (id, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)"
+    "INSERT INTO user_journeys (id, name, description, personaSlugs, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)"
   );
 
   mockUserJourneys.forEach((journey) => {
@@ -20,6 +20,7 @@ db.serialize(() => {
       journey.id,
       journey.name,
       journey.description,
+      JSON.stringify(journey.personas.map((p) => p.slug)),
       journey.createdAt,
       journey.updatedAt
     );
