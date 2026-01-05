@@ -6,6 +6,7 @@ import { getAllInsights, linkInsightToStep } from "@/api/insights";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import PreparedDrawer from "../layouts/Drawer";
+import { InsightIcon } from "./insight-icons";
 
 export default function LinkInsightDrawer() {
   const [searchParams] = useSearchParams();
@@ -63,9 +64,9 @@ function LinkInsight({ stepId, type }: { stepId: string; type: InsightTypes }) {
         ?.map((insight: Insight) => (
           <div
             key={insight.id}
-            className="border rounded p-2 pr-0.5 shadow-xs flex flex-row items-center gap-2"
+            className="border rounded-md p-2 pr-0.5 shadow-xs flex flex-row items-center gap-2"
           >
-            <Lightbulb size="16" />
+            <InsightIcon type={type} size="16" />
             <span className="flex-1 truncate">{insight.title}</span>
             <Button
               variant="ghost"

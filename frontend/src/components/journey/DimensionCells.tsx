@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Plus, Trash } from "lucide-react";
 import type { InsightTypes } from "@shared/types";
 import { Link, useSearchParams } from "react-router-dom";
+import { InsightIcon } from "../insights/insight-icons";
 
 export function ImageCell({
   imageId,
@@ -168,9 +169,10 @@ export function InsightCell({
             <Link
               to={`?insight=${insight.id}&step=${stepId}`}
               key={insight.id}
-              className="border rounded-sm px-2 py-1 hover:bg-gray-100"
+              className="border flex flex-row rounded-sm gap-2 px-2 py-1 hover:bg-gray-100"
             >
-              {insight.title}
+              <InsightIcon type={type} size="16" className="mt-1" />
+              <span className="flex-1">{insight.title}</span>
             </Link>
           ))}
         </div>

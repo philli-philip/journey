@@ -18,6 +18,7 @@ import { getInsight } from "@/api/insights";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PreparedDrawer from "../layouts/Drawer";
 import { useUpdateInsightMutation } from "@/hooks/useInsights";
+import { InsightIcon } from "./insight-icons";
 
 export default function UpdateInsightDrawer() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -134,15 +135,22 @@ function UpdateInsightForm({ id }: { id: string }) {
                   >
                     <SelectTrigger id={field.name} aria-disabled={isInvalid}>
                       <SelectValue placeholder="Select insight type" asChild>
-                        <span className="capitalize">{field.state.value}</span>
+                        <span className="capitalize">
+                          <InsightIcon
+                            type={field.state.value as InsightTypes}
+                            size="16"
+                          />
+                          {field.state.value}
+                        </span>
                       </SelectValue>
-                      <SelectContent>
+                      <SelectContent position="popper">
                         {InsightTypes.map((item) => (
                           <SelectItem
                             key={item}
                             value={item}
                             className="capitalize"
                           >
+                            <InsightIcon type={item} size="16" />
                             {item}
                           </SelectItem>
                         ))}

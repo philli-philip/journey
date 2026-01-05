@@ -1,13 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import InsightList from "@/components/InsightList";
-import { getColumns } from "@/components/insights-columns";
+import InsightList from "@/components/insights/InsightList";
+import { getColumns } from "@/components/insights/insights-columns";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Insight } from "@shared/types";
 import { getAllInsights } from "@/api/insights";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import CreateInsightDrawer from "@/components/insights/createInsightDrawer";
 import { PageTitle } from "@/components/ui/page-title";
+import { DetailHeader, HeaderTitle } from "@/components/layouts/blocks/header";
 
 export default function InsightsPage() {
   const queryClient = useQueryClient();
@@ -31,16 +30,13 @@ export default function InsightsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageTitle title="Insights" />
-      <div className="flex flex-row p-1 items-center gap-2 border-b border-border">
-        <Button asChild variant="ghost" size="icon">
-          <SidebarTrigger />
-        </Button>
-        <h1 className="font-semibold flex-1">Insights</h1>
+      <DetailHeader>
+        <HeaderTitle className="flex-1">Insights</HeaderTitle>
         <CreateInsightDrawer />
-      </div>
+      </DetailHeader>
       <InsightList columns={columns} data={data || []} />
-    </div>
+    </>
   );
 }

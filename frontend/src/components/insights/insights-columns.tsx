@@ -5,11 +5,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 import { MoreVerticalIcon } from "lucide-react";
 import { deleteInsight } from "@/api/insights";
 import { useQueryClient } from "@tanstack/react-query";
+import { InsightIcon } from "./insight-icons";
 
 export const getColumns = (
   query: ReturnType<typeof useQueryClient>
@@ -32,7 +33,12 @@ export const getColumns = (
     header: "Type",
     cell: ({ row }) => {
       const insight = row.original;
-      return <div className=" capitalize">{insight.type}</div>;
+      return (
+        <div className="flex items-center gap-2">
+          <InsightIcon type={insight.type} size="16" />
+          <span className=" capitalize">{insight.type}</span>
+        </div>
+      );
     },
   },
   {

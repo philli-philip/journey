@@ -8,10 +8,10 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { Input } from "./ui/input";
-import { Empty, EmptyTitle } from "./ui/empty";
+import { Input } from "../ui/input";
+import { Empty, EmptyTitle } from "../ui/empty";
 import { Link } from "react-router-dom";
-import UpdateInsightDrawer from "./insights/updateInsightDrawer";
+import UpdateInsightDrawer from "./updateInsightDrawer";
 
 interface InsightListProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

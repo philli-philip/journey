@@ -6,7 +6,7 @@ import UserJourneys from "./pages/journeys/journeyList.tsx";
 import JourneyView from "./pages/journeys/JourneySteps.tsx";
 import ViewLayout from "./pages/journeys/journeyLayout.tsx";
 import JourneyOverview from "./pages/journeys/JourneyOverview.tsx";
-import InsightsPage from "./pages/InsightsList.tsx";
+import InsightsPage from "./pages/insights/InsightsList.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import PersonaList from "./pages/personas/personaList.tsx";
