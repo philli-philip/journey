@@ -12,6 +12,6 @@
       "@shared/*": ["../shared/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "../shared/upgrade.ts"],
   "exclude": ["node_modules"]
 }

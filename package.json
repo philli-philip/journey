@@ -13,7 +13,8 @@
     "backend:lint": "cd server && npm run lint",
     "backend:check": "cd server && npm run check",
     "seed": "cd server && npm run seed",
-    "postinstall": "(cd server && npm i); (cd frontend && npm i)"
+    "postinstall": "(cd server && npm i); (cd frontend && npm i)",
+    "upgrade": "tsx ./shared/upgrade.ts"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "check": "tsc --noEmit",
     "seed": "tsx ./src/utils/seed.ts",
-    "upgrade": "tsx ./src/utils/upgrade.ts"
+    "upgrade": "tsx ./src/utils/upgrade.ts",
+    "migrate": "tsx src/db/cli.ts migrate",
+    "migrate:rollback": "tsx src/db/cli.ts rollback"
   },
   "keywords": [],
   "author": "",
