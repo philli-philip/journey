@@ -12,7 +12,7 @@ import { Button } from "../ui/button";
 import { X } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
-import { InsightTypes } from "@shared/types";
+import { insightTypes } from "@shared/types";
 import { toast } from "sonner";
 import { FieldError, FieldGroup, FieldLabel, Field } from "../ui/field";
 import { Input } from "../ui/input";
@@ -64,7 +64,7 @@ export default function CreateInsightDrawer() {
 const formSchema = z.object({
   title: z.string().min(3, "At least 3 characters are required as title"),
   description: z.string(),
-  type: z.enum(InsightTypes),
+  type: z.enum(insightTypes),
 });
 
 function CreateInsightForm() {
@@ -141,7 +141,7 @@ function CreateInsightForm() {
                         <span className="capitalize">{field.state.value}</span>
                       </SelectValue>
                       <SelectContent>
-                        {InsightTypes.map((item) => (
+                        {insightTypes.map((item) => (
                           <SelectItem
                             key={item}
                             value={item}

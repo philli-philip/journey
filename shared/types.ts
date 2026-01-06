@@ -39,9 +39,9 @@ export interface Connection {
   deletedAt?: string;
 }
 
-export const InsightTypes = ["pain", "gain", "need", "observation"] as const;
+export const insightTypes = ["pain", "gain", "need", "observation"] as const;
 
-export type InsightTypes = (typeof InsightTypes)[number];
+export type InsightTypes = (typeof insightTypes)[number];
 
 export interface Insight {
   id: string;

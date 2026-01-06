@@ -4,6 +4,7 @@ import { mockInsights } from "../mockdata/mockInsights";
 import { mockConnections } from "../mockdata/mockConnections";
 import { mockPersona } from "src/mockdata/mockPersona";
 import { createPersona } from "src/controllers/personaController";
+import { createInsight } from "src/controllers/insightController";
 
 console.log("Seeding database ...");
 
@@ -48,17 +49,12 @@ mockUserJourneys.forEach((journey) => {
   }
 });
 
-const stmtInsights = db.prepare(
-  "INSERT INTO insights (id, title, description, type) VALUES (?, ?,?, ?)"
-);
-
-mockInsights.forEach((insight) => {
-  stmtInsights.run(
-    insight.id,
-    insight.title,
-    insight.description,
-    insight.type
-  );
+mockInsights.forEach(async (insight) => {
+  await createInsight({
+    title: insight.title,
+    description: insight.description || "",
+    type: insight.type,
+  });
 });
 
 const stmtConnections = db.prepare(

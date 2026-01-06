@@ -26,8 +26,10 @@ export async function createPersona(persona: CreatePersonaDto) {
 export async function deletePersona(slug: string) {
   try {
     const result = db
-      .prepare("UPDATE personas SET deletedAT = ? WHERE slug = ? RETURNING *")
-      .get(Date.now(), slug);
+      .prepare(
+        "UPDATE personas SET deletedAT = CURRENT_TIMESTAMP WHERE slug = ? RETURNING *"
+      )
+      .get(slug);
 
     return result as Persona;
   } catch (err) {

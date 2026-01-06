@@ -42,12 +42,10 @@ export async function linkInsightToStep({
 
 export async function getInsight(id: string): Promise<Insight | undefined> {
   const response = await fetch(`${API_BASE_URL}/insights/${id}`);
-
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to get insight");
+    throw new Error(errorData);
   }
-
   return response.json();
 }
 
