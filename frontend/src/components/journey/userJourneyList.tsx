@@ -20,11 +20,13 @@ import { Link } from "react-router-dom";
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  actions?: JSX.Element;
 }
 
 export default function UserJourneysList<TData extends { id: string }, TValue>({
   columns,
   data,
+  actions,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -56,15 +58,16 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
 
   return (
     <>
-      <div className="flex items-center py-4 border-b">
+      <div className="flex items-center py-4 border-b justify-between px-2">
         <Input
           placeholder="Filter names..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="max-w-2xs shadow-none ml-2"
+          className="max-w-2xs shadow-none"
         />
+        {actions}
       </div>
       <div className="flex-auto overflow-scroll h-20 flex flex-col">
         <Table

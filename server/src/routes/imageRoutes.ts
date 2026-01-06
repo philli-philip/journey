@@ -1,11 +1,13 @@
 import { FastifyInstance } from "fastify";
 import { MultipartFile } from "@fastify/multipart";
-import { randomID } from "@shared/randomID";
 import db from "../db/db";
 import multipart from "@fastify/multipart";
 import { Multipart } from "@fastify/multipart";
-import sharp from "sharp";
-import { insertImage, processImage } from "src/controllers/imageController";
+import {
+  deleteImage,
+  insertImage,
+  processImage,
+} from "src/controllers/imageController";
 import { Step } from "@shared/types";
 
 declare module "fastify" {
@@ -79,33 +81,15 @@ export default async function imageRoutes(fastify: FastifyInstance) {
       imageId: string;
     };
 
-    try {
-      const transaction = db.transaction(() => {
-        db.prepare("UPDATE steps SET imageId = NULL WHERE imageId= ?").run(
-          imageId
-        );
-        return db
-          .prepare(
-            "UPDATE images SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?"
-          )
-          .run(imageId);
-      });
+    const transaction = db.transaction(() => {
+      db.prepare(
+        "UPDATE steps SET imageId = NULL WHERE imageId= ? RETURNING *"
+      ).get(imageId);
+      deleteImage(imageId);
+    });
+    transaction();
 
-      const result = transaction();
-
-      if (result.changes === 0) {
-        return reply
-          .code(404)
-          .send({ message: "Image not found or already deleted" });
-      }
-
-      const response = { message: "Image soft-deleted successfully" };
-      reply.code(200).send(response);
-      return response;
-    } catch (err: any) {
-      console.error("Error deleting image:", err);
-      reply.code(500).send({ message: "Error soft-deleting image" });
-    }
+    return reply.code(200).send({ message: "Image soft-deleted successfully" });
   });
 
   fastify.get("/images/:imageId", async (request, reply) => {

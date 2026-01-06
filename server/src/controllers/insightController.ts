@@ -61,7 +61,7 @@ export async function getInsight(id: string) {
 }
 
 export async function getInsightList(filter?: { type?: InsightTypes }) {
-  if (!filter) {
+  if (!filter?.type) {
     const items = db
       .prepare("SELECT * FROM insights WHERE deletedAt is NULL")
       .all() as Insight[];

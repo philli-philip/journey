@@ -1,58 +1,45 @@
 import { FastifyInstance } from "fastify";
 import db from "../db/db";
 import { randomID } from "@shared/randomID";
-import type { updateJourneyDto } from "@shared/Dto/journey.types";
-import { buildFieldValueClause } from "src/utils/sql-helper";
+import type {
+  createJourneyDto,
+  updateJourneyDto,
+} from "@shared/Dto/journey.types";
+import {
+  createJourney,
+  deleteJourney,
+  getJourneyList,
+  restoreJourney,
+  updateJourney,
+} from "src/controllers/journeyController";
 
 export default async function journeyRoutes(fastify: FastifyInstance) {
-  fastify.get("/journeys", (request, reply) => {
+  fastify.get("/journeys", async (request, reply) => {
     const { personaSlug } = request.query as { personaSlug?: string };
 
-    try {
-      const rows = db.prepare(
-        `SELECT * FROM user_journeys WHERE deletedAt IS NULL ${
-          personaSlug ? "AND personaSlugs LIKE ?" : ""
-        }`
-      ).all(personaSlug ? [`%${personaSlug}%`] : []);
-      reply.status(200).send(rows);
-    } catch (err: any) {
-      console.log("Error fetching journeys: ", err);
-      reply.code(500).send({ message: "Error fetching journeys:", err });
-    }
+    const items = await getJourneyList({ personaSlug });
+    return items;
   });
 
   fastify.post("/journeys", async (request, reply) => {
-    const id = randomID();
-    const title = "New journey";
-    const createdAt = new Date().toISOString();
-    const updatedAt = new Date().toISOString();
+    const { personaSlugs, name, description, orderedStepIds } =
+      request.body as createJourneyDto;
 
-    try {
-      db.prepare(
-        "INSERT INTO user_journeys (id, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)"
-      ).run(id, title, "", createdAt, updatedAt);
-      
-      const response = {
-        id,
-        name: title,
-        description: "",
-        steps: [],
-        createdAt,
-        updatedAt,
-      };
-      reply.code(201).send(response);
-      return response;
-    } catch (err: any) {
-      reply.code(500).send({ message: "Error creating journey" });
-      throw err;
-    }
+    const item = await createJourney({
+      name,
+      description,
+      orderedStepIds,
+      personaSlugs,
+    });
+    return item;
   });
 
   fastify.get("/journeys/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
     try {
-      const row = db.prepare(
-        `SELECT
+      const row = db
+        .prepare(
+          `SELECT
           uj.id AS id,
           uj.name AS name,
           uj.description AS description,
@@ -91,12 +78,13 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
           user_journeys AS uj
         WHERE
           uj.id = ?`
-      ).get(id) as { personas: string; steps: string } | undefined;
+        )
+        .get(id) as { personas: string; steps: string } | undefined;
 
       if (!row) {
         return reply.code(404).send({ message: "Journey not found" });
       }
-      
+
       // Parse JSON strings into objects
       if (row.personas) {
         row.personas = JSON.parse(row.personas);
@@ -111,69 +99,23 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.put("/journeys/:id", (request, reply) => {
+  fastify.put("/journeys/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
     const updates = request.body as updateJourneyDto["updates"];
 
-    const { fields: personaFields, values: personaValues } =
-      buildFieldValueClause({
-        updates,
-        updatedAt: true,
-      });
-
-    try {
-      const result = db.prepare(
-        `UPDATE user_journeys SET ${personaFields}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`
-      ).run(...personaValues, id);
-
-      if (result.changes === 0) {
-        return reply.code(404).send({ message: "Journey not found" });
-      }
-      reply.code(200).send("Journey updated successfully");
-    } catch (err: any) {
-      reply.code(500).send({ message: "Error updating journey: " + err.message });
-    }
+    const update = await updateJourney({ id, updates });
+    return update;
   });
 
   fastify.delete("/journeys/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
-    try {
-      const result = db.prepare(
-        "UPDATE user_journeys SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?"
-      ).run(id);
-
-      if (result.changes === 0) {
-        reply.code(404).send({ message: "Journey not found" });
-        return;
-      }
-      
-      const response = { message: "Journey soft-deleted successfully" };
-      reply.code(200).send(response);
-      return response;
-    } catch (err: any) {
-      reply.code(500).send({ message: "Error soft-deleting journey" });
-      throw err;
-    }
+    const result = deleteJourney(id);
+    return result;
   });
 
   fastify.put("/journeys/:id/restore", async (request, reply) => {
     const { id } = request.params as { id: string };
-    try {
-      const result = db.prepare(
-        "UPDATE user_journeys SET deletedAt = NULL, updatedAt = CURRENT_TIMESTAMP WHERE id = ?"
-      ).run(id);
-
-      if (result.changes === 0) {
-        reply.code(404).send({ message: "Journey not found" });
-        return;
-      }
-      
-      const response = { message: "Journey restored successfully" };
-      reply.code(200).send(response);
-      return response;
-    } catch (err: any) {
-      reply.code(500).send({ message: "Error restoring journey" });
-      throw err;
-    }
+    const item = await restoreJourney(id);
+    reply.send(item);
   });
 }

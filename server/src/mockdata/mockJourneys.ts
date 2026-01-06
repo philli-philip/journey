@@ -35,6 +35,7 @@ export const mockUserJourneys: UserJourney[] = [
     steps: [
       {
         id: "s0",
+        journeyId: "uj2",
         name: "landing page",
         description: "Welcome to the onboarding process.",
         attributes: {
@@ -45,6 +46,7 @@ export const mockUserJourneys: UserJourney[] = [
       },
       {
         id: "s1",
+        journeyId: "uj2",
         name: "Sign Up",
         description: "User creates an account.",
         attributes: {
@@ -55,6 +57,7 @@ export const mockUserJourneys: UserJourney[] = [
       },
       {
         id: "s2",
+        journeyId: "uj2",
         name: "Profile Creation",
         description: "User fills out their profile information.",
         attributes: {
@@ -77,6 +80,7 @@ export const mockUserJourneys: UserJourney[] = [
         id: "s3",
         name: "Browse Products",
         description: "User views product listings.",
+        journeyId: "uj2",
         attributes: {
           pains: "Overwhelmed by choices",
           insights: "Personalized recommendations increase engagement",
@@ -86,6 +90,7 @@ export const mockUserJourneys: UserJourney[] = [
       {
         id: "s4",
         name: "Add to Cart",
+        journeyId: "uj2",
         description: "User adds items to the shopping cart.",
         attributes: {
           pains: "Unclear shipping costs",
@@ -96,6 +101,7 @@ export const mockUserJourneys: UserJourney[] = [
       {
         id: "s5",
         name: "Checkout",
+        journeyId: "uj2",
         description: "User completes the purchase.",
         attributes: {
           pains: "Long checkout process",
@@ -116,6 +122,7 @@ export const mockUserJourneys: UserJourney[] = [
       {
         id: "s6",
         name: "Access Help Center",
+        journeyId: "uj3",
         description: "User navigates to the help or support section.",
 
         attributes: {
@@ -127,6 +134,7 @@ export const mockUserJourneys: UserJourney[] = [
       {
         id: "s7",
         name: "Submit Ticket",
+        journeyId: "uj3",
         description: "User submits a support request.",
         attributes: {
           pains: "Long wait times for response",
@@ -138,6 +146,7 @@ export const mockUserJourneys: UserJourney[] = [
       {
         id: "s8",
         name: "Receive Resolution",
+        journeyId: "uj3",
         description: "User gets a solution to their problem.",
         attributes: {
           pains: "Unresolved issues or multiple interactions",

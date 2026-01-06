@@ -61,8 +61,7 @@ export async function deleteStep(stepId: string) {
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to create step");
+    throw new Error(response.statusText);
   }
   const data = response.json();
   return data;

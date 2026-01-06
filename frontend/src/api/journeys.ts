@@ -1,8 +1,15 @@
 import { API_BASE_URL } from "@shared/constants";
-import type { updateJourneyDto } from "@shared/Dto/journey.types";
+import type {
+  createJourneyDto,
+  updateJourneyDto,
+} from "@shared/Dto/journey.types";
 
 export async function fetchAllJourneys(filter?: { personaSlug?: string }) {
-  const response = await fetch(`${API_BASE_URL}/journeys${filter?.personaSlug ? `?personaSlug=${filter.personaSlug}` : ""}`);
+  const response = await fetch(
+    `${API_BASE_URL}/journeys${
+      filter?.personaSlug ? `?personaSlug=${filter.personaSlug}` : ""
+    }`
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch journeys");
   }
@@ -10,15 +17,19 @@ export async function fetchAllJourneys(filter?: { personaSlug?: string }) {
   return data;
 }
 
-export async function createJourney() {
+export async function createJourney(data: createJourneyDto) {
   const response = await fetch(`${API_BASE_URL}/journeys`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
   });
   if (!response.ok) {
     throw new Error("Failed to create journey");
   }
-  const data = await response.json();
-  return data;
+  const item = await response.json();
+  return item;
 }
 
 export async function fetchJourneyById(id: string) {

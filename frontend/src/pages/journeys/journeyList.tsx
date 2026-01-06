@@ -15,7 +15,7 @@ export default function UserJourneys() {
   const columns = useJourneyColumns();
 
   const handleCreateJourney = async () => {
-    const newJourney = await createJourney();
+    const newJourney = await createJourney({});
     if (newJourney && newJourney.id) {
       navigate(`/journey/${newJourney.id}/overview`);
     }

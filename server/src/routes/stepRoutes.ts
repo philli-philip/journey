@@ -1,6 +1,8 @@
 import { FastifyInstance } from "fastify";
 import db from "../db/db";
 import { randomID } from "@shared/randomID";
+import { deleteStep } from "src/controllers/stepController";
+import { removeStepFromJourney } from "src/controllers/journeyController";
 
 export default async function stepRoutes(fastify: FastifyInstance) {
   fastify.post("/journeys/:journeyId/steps", async (request, reply) => {
@@ -112,18 +114,9 @@ export default async function stepRoutes(fastify: FastifyInstance) {
       stepId: string;
     };
 
-    try {
-      const result = db.prepare("DELETE from steps WHERE id = ?").run(stepId);
-      if (result.changes === 0) {
-        return reply.code(404).send({
-          message: "Step not found or does not belong to the specified journey",
-        });
-      }
-      return reply.code(200).send({ message: "Step deleted successfully" });
-    } catch (err: any) {
-      console.error("Error deleting step:", err);
-      reply.code(500).send({ message: "Error deleting step" });
-    }
+    const item = await deleteStep(stepId);
+    await removeStepFromJourney(item.journeyId, stepId);
+    return item;
   });
 
   fastify.delete(

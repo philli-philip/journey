@@ -7,3 +7,10 @@ export interface updateJourneyDto {
     orderedStepIds?: string[];
   };
 }
+
+export interface createJourneyDto {
+  name?: string;
+  description?: string;
+  personaSlugs?: string[];
+  orderedStepIds?: string[];
+}
