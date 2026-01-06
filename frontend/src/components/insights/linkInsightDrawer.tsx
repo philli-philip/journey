@@ -1,6 +1,6 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import { Button } from "../ui/button";
-import { Lightbulb, Link } from "lucide-react";
+import { Link } from "lucide-react";
 import type { Insight, InsightTypes } from "@shared/types";
 import { getAllInsights, linkInsightToStep } from "@/api/insights";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
