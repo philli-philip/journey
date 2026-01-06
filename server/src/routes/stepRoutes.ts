@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import db from "../db";
+import db from "../db/db";
 import { randomID } from "@shared/randomID";
 
 export default async function stepRoutes(fastify: FastifyInstance) {

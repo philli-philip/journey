@@ -1,4 +1,4 @@
-import db from "../db";
+import db from "../db/db";
 import { mockUserJourneys } from "../mockdata/mockJourneys";
 import { mockInsights } from "../mockdata/mockInsights";
 import { mockConnections } from "../mockdata/mockConnections";

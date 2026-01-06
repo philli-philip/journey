@@ -1,17 +1,29 @@
-export const CREATE_USER_JOURNEYS_TABLE = `
-  CREATE TABLE IF NOT EXISTS user_journeys (
-    id TEXT PRIMARY KEY NOT NULL,
-    name TEXT NOT NULL,
-    description TEXT,
-    personaSlugs TEXT DEFAULT '[]',
-    orderedStepIds TEXT DEFAULT '[]',
-    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
-    deletedAt TEXT DEFAULT NULL
-  )
-`;
+import { Migration } from "../migrator";
 
-export const CREATE_STEPS_TABLE = `
+export const migration: Migration = {
+  id: 1,
+  name: "initial-setup",
+  up: (db) => {
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS migrations (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+        `);
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS user_journeys (
+            id TEXT PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            personaSlugs TEXT DEFAULT '[]',
+            orderedStepIds TEXT DEFAULT '[]',
+            createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+            updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+            deletedAt TEXT DEFAULT NULL
+        )
+`);
+    db.exec(`
   CREATE TABLE IF NOT EXISTS steps (
     id TEXT PRIMARY KEY NOT NULL,
     journeyId TEXT NOT NULL,
@@ -27,9 +39,8 @@ export const CREATE_STEPS_TABLE = `
     FOREIGN KEY (journeyId) REFERENCES user_journeys(id),
     FOREIGN KEY (imageId) REFERENCES images(id)
   )
-`;
-
-export const CREATE_IMAGES_TABLE = `
+`);
+    db.exec(`
   CREATE TABLE IF NOT EXISTS images (
     id TEXT PRIMARY KEY NOT NULL,
     imageData BLOB NOT NULL,
@@ -42,9 +53,8 @@ export const CREATE_IMAGES_TABLE = `
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL
   )
-`;
-
-export const CREATE_INSIGHTS_TABLE = `
+`);
+    db.exec(`
   CREATE TABLE IF NOT EXISTS insights (
     id TEXT PRIMARY KEY NOT NULL,
     title TEXT DEFAULT 'New Insight',
@@ -54,9 +64,8 @@ export const CREATE_INSIGHTS_TABLE = `
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL
   )
-`;
-
-export const CREATE_STEP_CONNECTIONS_TABLE = `
+`);
+    db.exec(`
   CREATE TABLE IF NOT EXISTS step_connections (
     id TEXT PRIMARY KEY NOT NULL,
     stepId TEXT NOT NULL,
@@ -66,9 +75,8 @@ export const CREATE_STEP_CONNECTIONS_TABLE = `
     deletedAt TEXT DEFAULT NULL,
     FOREIGN KEY (stepId) REFERENCES steps(id)
 )
-`;
-
-export const CREATE_PERSONA_TABLE = `
+`);
+    db.exec(`
   CREATE TABLE IF NOT EXISTS personas (
     slug TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL DEFAULT 'New Persona' ,
@@ -77,4 +85,15 @@ export const CREATE_PERSONA_TABLE = `
     updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
     deletedAt TEXT DEFAULT NULL
   )
-`;
+`);
+  },
+  down: (db) => {
+    db.exec("DROP TABLE IF EXISTS migrations");
+    db.exec("DROP TABLE IF EXISTS personas");
+    db.exec("DROP TABLE IF EXISTS insights");
+    db.exec("DROP TABLE IF EXISTS step_connections");
+    db.exec("DROP TABLE IF EXISTS steps");
+    db.exec("DROP TABLE IF EXISTS user_journeys");
+    db.exec("DROP TABLE IF EXISTS images");
+  },
+};

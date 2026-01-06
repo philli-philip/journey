@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { MultipartFile } from "@fastify/multipart";
 import { randomID } from "@shared/randomID";
-import db from "../db";
+import db from "../db/db";
 import multipart from "@fastify/multipart";
 import { Multipart } from "@fastify/multipart";
 import sharp from "sharp";

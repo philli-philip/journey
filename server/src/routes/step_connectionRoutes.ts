@@ -1,6 +1,6 @@
 import { randomID } from "@shared/randomID";
 import { FastifyInstance } from "fastify";
-import db from "src/db";
+import db from "src/db/db";
 
 export default async function stepConnectionRoutes(app: FastifyInstance) {
   app.get("/connections", (req, res) => {

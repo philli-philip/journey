@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import db from "../db";
+import db from "../db/db";
 import { randomID } from "@shared/randomID";
 import type { updateJourneyDto } from "@shared/Dto/journey.types";
 import { buildFieldValueClause } from "src/utils/sql-helper";

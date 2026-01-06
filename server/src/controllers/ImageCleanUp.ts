@@ -1,4 +1,4 @@
-import db from "src/db";
+import db from "src/db/db";
 import { AsyncTask, CronJob } from "toad-scheduler";
 
 const imageCleanUp = new AsyncTask("simple task", async () => {

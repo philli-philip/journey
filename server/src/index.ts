@@ -9,6 +9,8 @@ import { ImageCleanUpCron } from "./controllers/ImageCleanUp";
 import stepConnectionRoutes from "./routes/step_connectionRoutes";
 import personaRoutes from "./routes/personaRoutes";
 import { API_BASE_PORT, APP_URL } from "@shared/constants";
+import { Migrator } from "./db/migrator";
+import path from "path";
 
 const fastify = Fastify({
   logger: true,
@@ -32,6 +34,9 @@ fastify.ready().then(() => {
 });
 
 const start = async () => {
+  const migrator = new Migrator(path.join(__dirname, "/db/migrations"));
+  await migrator.runMigrations();
+
   try {
     console.log(`Attempting to listen on port ${API_BASE_PORT}`);
     await fastify.listen({ port: API_BASE_PORT });

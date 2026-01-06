@@ -1,7 +1,7 @@
 import { Persona } from "@shared/types";
 import { FastifyInstance } from "fastify";
 import { CreatePersonaDto, UpdatePersonaDto } from "@shared/Dto/persona.types";
-import db from "src/db";
+import db from "src/db/db";
 import { buildFieldValueClause } from "src/utils/sql-helper";
 
 export default async function personaRoutes(fastify: FastifyInstance) {
