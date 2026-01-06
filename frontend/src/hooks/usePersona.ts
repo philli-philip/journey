@@ -15,6 +15,7 @@ export const usePersonaQuery = (slug: string) => {
   return useQuery({
     queryKey: ["personas", slug],
     queryFn: () => getPersona(slug),
+    enabled: !!slug,
   });
 };
 

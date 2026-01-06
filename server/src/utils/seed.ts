@@ -3,6 +3,7 @@ import { mockUserJourneys } from "../mockdata/mockJourneys";
 import { mockInsights } from "../mockdata/mockInsights";
 import { mockConnections } from "../mockdata/mockConnections";
 import { mockPersona } from "src/mockdata/mockPersona";
+import { createPersona } from "src/controllers/personaController";
 
 console.log("Seeding database ...");
 
@@ -74,12 +75,12 @@ mockConnections.forEach((connection) => {
   );
 });
 
-const stmtPersonas = db.prepare(
-  "INSERT INTO personas (slug, name, description) VALUES (?, ?, ?)"
-);
-
 mockPersona.forEach((persona) => {
-  stmtPersonas.run(persona.slug, persona.name, persona.description);
+  createPersona({
+    slug: persona.slug,
+    name: persona.name,
+    description: persona.description,
+  });
 });
 
 console.log("Database seeded successfully.");

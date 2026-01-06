@@ -6,6 +6,8 @@ export interface CreatePersonaDto {
 
 export interface UpdatePersonaDto {
   slug: string;
-  name?: string;
-  description?: string;
+  changes: {
+    name?: string;
+    description?: string;
+  };
 }

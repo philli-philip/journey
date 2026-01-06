@@ -1,6 +1,6 @@
 import { Empty } from "@/components/ui/empty";
-import { useJourneyColumns } from "@/components/user-journeys-columns";
-import UserJourneyList from "@/components/userJourneyList";
+import { useJourneyColumns } from "@/components/journey/user-journeys-columns";
+import UserJourneyList from "@/components/journey/userJourneyList";
 import useAllJourneys from "@/hooks/useAllJourneys";
 import { useParams } from "react-router-dom";
 

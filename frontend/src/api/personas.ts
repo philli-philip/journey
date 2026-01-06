@@ -7,38 +7,19 @@ import { API_BASE_URL } from "@shared/constants";
 
 export async function getPersonas() {
   const response = await fetch(`${API_BASE_URL}/personas`);
-  try {
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to fetch personas");
-    }
-    const personas: Persona[] = await response.json();
-    return personas;
-  } catch (error) {
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : "Error while processing the response"
-    );
+  
+  if (!response.ok) {
+    throw new Error(response.statusText);
   }
+  return (await response.json()) as Persona[];
 }
 
 export async function getPersona(slug: string) {
   const response = await fetch(`${API_BASE_URL}/personas/${slug}`);
-  try {
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to fetch persona");
-    }
-    const persona: Persona = await response.json();
-    return persona;
-  } catch (error) {
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : "Error while processing the response"
-    );
+  if (!response.ok) {
+    throw new Error(response.statusText);
   }
+  return (await response.json()) as Persona;
 }
 
 export async function createPersona(persona: CreatePersonaDto) {

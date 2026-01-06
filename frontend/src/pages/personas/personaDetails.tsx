@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 export default function PersonaDetails() {
   const { slug } = useParams();
-  const { data: persona, isLoading } = usePersonaQuery(slug || "");
+  const { data: persona } = usePersonaQuery(slug || "");
 
   const { mutate } = useUpdatePersonaMutation();
 
@@ -12,16 +12,15 @@ export default function PersonaDetails() {
     if (slug) {
       mutate({
         slug: slug,
-        description: newDescription,
+        changes: {
+          description: newDescription,
+        },
       });
     }
   };
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
-  if (!persona || !slug) {
-    return <div>Persona not found</div>;
+  if (!persona) {
+    return;
   }
 
   return (

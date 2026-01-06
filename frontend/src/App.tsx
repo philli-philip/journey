@@ -14,7 +14,18 @@ import PersonaDetails from "./pages/personas/personaDetails.tsx";
 import PersonaLayout from "./pages/personas/personasLayout.tsx";
 import PersonaJourneys from "./pages/personas/personaJourneys.tsx";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (_failureCount, error) => {
+        if (error.message.includes("Not Found")) {
+          return false;
+        }
+        return true;
+      },
+    },
+  },
+});
 
 function App() {
   return (

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useJourneyColumns } from "@/components/user-journeys-columns";
-import UserJourneyList from "@/components/userJourneyList";
+import { useJourneyColumns } from "@/components/journey/user-journeys-columns";
+import UserJourneyList from "@/components/journey/userJourneyList";
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import useAllJourneys from "@/hooks/useAllJourneys";
 import { useNavigate } from "react-router-dom";

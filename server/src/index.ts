@@ -12,9 +12,20 @@ import { API_BASE_PORT, APP_URL } from "@shared/constants";
 import { Migrator } from "./db/migrator";
 import path from "path";
 import { fileURLToPath } from "url";
+import { AppError } from "./utils/errors";
 
 const fastify = Fastify({
   logger: true,
+});
+
+fastify.setErrorHandler((error, request, reply) => {
+  if (error instanceof AppError) {
+    return reply.status(error.statusCode).send({ error: error.message });
+  }
+
+  // Fallback for other errors
+  fastify.log.error(error);
+  reply.status(500).send({ error: "Internal server error" });
 });
 
 fastify.register(cors, {

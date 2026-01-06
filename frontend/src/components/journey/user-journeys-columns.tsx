@@ -2,7 +2,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { type UserJourney } from "@shared/types";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ActionCell } from "./journey/tabelCells";
+import { ActionCell } from "./tabelCells";
 
 export const useJourneyColumns = (): ColumnDef<UserJourney>[] => [
   {
