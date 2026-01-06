@@ -5,6 +5,8 @@ import db from "../db/db";
 import multipart from "@fastify/multipart";
 import { Multipart } from "@fastify/multipart";
 import sharp from "sharp";
+import { insertImage, processImage } from "src/controllers/imageController";
+import { Step } from "@shared/types";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -27,35 +29,17 @@ export default async function imageRoutes(fastify: FastifyInstance) {
     let altText: string | undefined;
     let imageData: Buffer | undefined;
     let finalMimeType = "image/jpeg";
-    let processedImage: Buffer | undefined;
 
-    try {
-      const parts = request.parts();
-      for await (const part of parts) {
-        if (part.type === "file") {
-          file = part;
-          imageData = await file.toBuffer(); // Consume the file stream here
-
-          processedImage = await sharp(imageData)
-            .resize(1600, 1600, {
-              withoutEnlargement: true, // Don't upscale smaller images
-              fit: "inside", // Maintain aspect ratio
-            })
-            .jpeg({ quality: 85 }) // Convert to JPEG with good quality
-            .toBuffer();
-          finalMimeType = "image/jpeg";
-        } else {
-          if (part.fieldname === "stepId") {
-            stepId = part.value as string;
-          } else if (part.fieldname === "altText") {
-            altText = part.value as string;
-          }
+    const parts = request.parts();
+    for await (const part of parts) {
+      if (part.type === "file") {
+        file = part;
+        imageData = await file.toBuffer();
+      } else {
+        if (part.fieldname === "stepId") {
+          stepId = part.value as string;
         }
       }
-    } catch (parseError) {
-      console.error("Error parsing multipart request:", parseError);
-      reply.code(500).send({ message: "Error parsing multipart request." });
-      return;
     }
 
     if (!file || !imageData) {
@@ -68,49 +52,26 @@ export default async function imageRoutes(fastify: FastifyInstance) {
       return;
     }
 
-    const imageId = randomID();
+    const { processedImage } = await processImage(imageData);
+    const imageId = await insertImage(
+      processedImage,
+      imageData,
+      file!.filename,
+      finalMimeType,
+      file!.file.bytesRead,
+      altText
+    );
 
-    try {
-      const transaction = db.transaction(() => {
-        db.prepare(
-          "INSERT INTO images (id, imageData, originalImage, filename, mimeType, size, altText) VALUES (?, ?, ?, ?, ?, ?,?)"
-        ).run(
-          imageId,
-          processedImage,
-          imageData,
-          file!.filename,
-          finalMimeType,
-          file!.file.bytesRead,
-          altText
-        );
+    const step = (await db
+      .prepare("UPDATE steps SET imageId = ? WHERE id = ? RETURNING *")
+      .get(imageId, stepId)) as Step;
 
-        db.prepare("UPDATE steps SET imageId = ? WHERE id = ?").run(
-          imageId,
-          stepId
-        );
-      });
-
-      transaction();
-
-      const row = db
-        .prepare("SELECT journeyId FROM steps WHERE id = ?")
-        .get(stepId) as { journeyId: string } | undefined;
-
-      if (!row) {
-        return reply.code(404).send({ message: "Step not found." });
-      }
-
-      const response = {
-        message: "Image uploaded and step updated successfully.",
-        imageId: imageId,
-        journeyId: row.journeyId,
-      };
-      reply.code(200).send(response);
-      return response;
-    } catch (err: any) {
-      console.error("Error uploading image:", err);
-      reply.code(500).send({ message: "Error uploading image." });
-    }
+    const response = {
+      message: "Image uploaded and step updated successfully.",
+      imageId: imageId,
+      journeyId: step.journeyId,
+    };
+    reply.send(response);
   });
 
   fastify.delete("/images/:imageId", async (request, reply) => {

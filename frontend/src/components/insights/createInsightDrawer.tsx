@@ -12,7 +12,7 @@ import { Button } from "../ui/button";
 import { X } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
-import { insightTypes } from "@shared/types";
+import { insightTypes, type InsightTypes } from "@shared/types";
 import { toast } from "sonner";
 import { FieldError, FieldGroup, FieldLabel, Field } from "../ui/field";
 import { Input } from "../ui/input";
@@ -26,6 +26,7 @@ import {
 } from "../ui/select";
 import { createInsight } from "@/api/insights";
 import { useQueryClient } from "@tanstack/react-query";
+import { InsightIcon } from "./insight-icons";
 
 export default function CreateInsightDrawer() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -138,15 +139,21 @@ function CreateInsightForm() {
                   >
                     <SelectTrigger id={field.name} aria-disabled={isInvalid}>
                       <SelectValue placeholder="Select insight type" asChild>
-                        <span className="capitalize">{field.state.value}</span>
+                        <span className="capitalize">
+                          <InsightIcon
+                            type={field.state.value as InsightTypes}
+                          />
+                          {field.state.value}
+                        </span>
                       </SelectValue>
-                      <SelectContent>
+                      <SelectContent position="popper">
                         {insightTypes.map((item) => (
                           <SelectItem
                             key={item}
                             value={item}
                             className="capitalize"
                           >
+                            <InsightIcon type={item} />
                             {item}
                           </SelectItem>
                         ))}

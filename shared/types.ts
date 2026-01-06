@@ -8,6 +8,7 @@ export interface Dimension {
 export interface Step {
   id: string;
   name: string;
+  journeyId: string;
   description: string;
   imageId?: string;
   attributes: Record<
