@@ -7,6 +7,7 @@ import { Plus, Trash } from "lucide-react";
 import type { InsightTypes } from "@shared/types";
 import { Link, useSearchParams } from "react-router-dom";
 import { InsightIcon } from "../insights/insight-icons";
+import { API_BASE_URL } from "@shared/constants";
 
 export function ImageCell({
   imageId,
@@ -105,7 +106,7 @@ export function ImageCell({
       {imageId ? (
         <div className="relative group aspect-video w-full items-center flex flex-col">
           <img
-            src={`${import.meta.env.VITE_API_BASE_URL}/images/${imageId}`}
+            src={`${API_BASE_URL}/images/${imageId}`}
             alt={""}
             className="object-contain max-h-full border rounded-sm"
           />
