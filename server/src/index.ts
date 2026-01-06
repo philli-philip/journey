@@ -5,12 +5,13 @@ import stepRoutes from "./routes/stepRoutes";
 import insightRoutes from "./routes/insightRoutes";
 import imageRoutes from "./routes/imageRoutes";
 import fastifySchedule from "@fastify/schedule";
-import { ImageCleanUpCron } from "./controllers/ImageCleanUp";
+import { ImageCleanUpCron } from "./cron/ImageCleanUp";
 import stepConnectionRoutes from "./routes/step_connectionRoutes";
 import personaRoutes from "./routes/personaRoutes";
 import { API_BASE_PORT, APP_URL } from "@shared/constants";
 import { Migrator } from "./db/migrator";
 import path from "path";
+import { fileURLToPath } from "url";
 
 const fastify = Fastify({
   logger: true,
@@ -34,6 +35,8 @@ fastify.ready().then(() => {
 });
 
 const start = async () => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   const migrator = new Migrator(path.join(__dirname, "/db/migrations"));
   await migrator.runMigrations();
 

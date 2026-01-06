@@ -4,13 +4,14 @@ import db from "src/db/db";
 
 export default async function stepConnectionRoutes(app: FastifyInstance) {
   app.get("/connections", (req, res) => {
-    db.all("SELECT * FROM step_connections", (err, stepConnections) => {
-      if (err) {
-        res.status(500).send({ error: err.message });
-      } else {
-        res.send(stepConnections);
-      }
-    });
+    try {
+      const stepConnections = db
+        .prepare("SELECT * FROM step_connections")
+        .all();
+      res.send(stepConnections);
+    } catch (err: any) {
+      res.status(500).send({ error: err.message });
+    }
   });
 
   app.post("/connections", (req, res) => {
@@ -20,16 +21,13 @@ export default async function stepConnectionRoutes(app: FastifyInstance) {
       type: string;
       attributeId: string;
     };
-    db.run(
-      "INSERT INTO step_connections (id, stepId, attributeType, attributeID) VALUES (?,?, ?, ?)",
-      [id, stepId, "insight", attributeId],
-      (err) => {
-        if (err) {
-          res.status(500).send({ error: err.message });
-        } else {
-          res.send({ id, stepId, type, attributeId });
-        }
-      }
-    );
+    try {
+      db.prepare(
+        "INSERT INTO step_connections (id, stepId, attributeType, attributeID) VALUES (?,?, ?, ?)"
+      ).run(id, stepId, "insight", attributeId);
+      res.send({ id, stepId, type, attributeId });
+    } catch (err: any) {
+      res.status(500).send({ error: err.message });
+    }
   });
 }

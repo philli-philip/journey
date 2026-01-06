@@ -8,19 +8,17 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
   fastify.get("/journeys", (request, reply) => {
     const { personaSlug } = request.query as { personaSlug?: string };
 
-    db.all(
-      `SELECT * FROM user_journeys WHERE deletedAt IS NULL ${
-        personaSlug ? "AND personaSlugs LIKE ?" : ""
-      }`,
-      personaSlug ? [`%${personaSlug}%`] : [],
-      (err, rows) => {
-        if (err) {
-          console.log("Error fetching journeys: ", err);
-          reply.code(500).send({ message: "Error fetching journeys:", err });
-        }
-        reply.status(200).send(rows);
-      }
-    );
+    try {
+      const rows = db.prepare(
+        `SELECT * FROM user_journeys WHERE deletedAt IS NULL ${
+          personaSlug ? "AND personaSlugs LIKE ?" : ""
+        }`
+      ).all(personaSlug ? [`%${personaSlug}%`] : []);
+      reply.status(200).send(rows);
+    } catch (err: any) {
+      console.log("Error fetching journeys: ", err);
+      reply.code(500).send({ message: "Error fetching journeys:", err });
+    }
   });
 
   fastify.post("/journeys", async (request, reply) => {
@@ -29,40 +27,31 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
     const createdAt = new Date().toISOString();
     const updatedAt = new Date().toISOString();
 
-    return new Promise((resolve, reject) => {
-      db.run(
-        "INSERT INTO user_journeys (id, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)",
-        [id, title, "", createdAt, updatedAt],
-        function (err) {
-          if (err) {
-            reply.code(500).send({ message: "Error creating journey" });
-            reject(err);
-          }
-          reply.code(201).send({
-            id,
-            name: title,
-            description: "",
-            steps: [],
-            createdAt,
-            updatedAt,
-          });
-          resolve({
-            id,
-            name: title,
-            description: "",
-            steps: [],
-            createdAt,
-            updatedAt,
-          });
-        }
-      );
-    });
+    try {
+      db.prepare(
+        "INSERT INTO user_journeys (id, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)"
+      ).run(id, title, "", createdAt, updatedAt);
+      
+      const response = {
+        id,
+        name: title,
+        description: "",
+        steps: [],
+        createdAt,
+        updatedAt,
+      };
+      reply.code(201).send(response);
+      return response;
+    } catch (err: any) {
+      reply.code(500).send({ message: "Error creating journey" });
+      throw err;
+    }
   });
 
   fastify.get("/journeys/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
-    return new Promise((resolve, reject) => {
-      db.get(
+    try {
+      const row = db.prepare(
         `SELECT
           uj.id AS id,
           uj.name AS name,
@@ -101,27 +90,25 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
         FROM
           user_journeys AS uj
         WHERE
-          uj.id = ?`,
-        [id],
-        (err, row: { personas: string; steps: string }) => {
-          if (err) {
-            reply.code(500).send({ message: "Error fetching journey" });
-            reject(err);
-          }
-          if (!row) {
-            return reply.code(404).send({ message: "Journey not found" });
-          }
-          // Parse JSON strings into objects
-          if (row.personas) {
-            row.personas = JSON.parse(row.personas);
-          }
-          if (row.steps) {
-            row.steps = JSON.parse(row.steps);
-          }
-          return reply.code(200).send(row);
-        }
-      );
-    });
+          uj.id = ?`
+      ).get(id) as { personas: string; steps: string } | undefined;
+
+      if (!row) {
+        return reply.code(404).send({ message: "Journey not found" });
+      }
+      
+      // Parse JSON strings into objects
+      if (row.personas) {
+        row.personas = JSON.parse(row.personas);
+      }
+      if (row.steps) {
+        row.steps = JSON.parse(row.steps);
+      }
+      return reply.code(200).send(row);
+    } catch (err: any) {
+      reply.code(500).send({ message: "Error fetching journey" });
+      throw err;
+    }
   });
 
   fastify.put("/journeys/:id", (request, reply) => {
@@ -134,63 +121,59 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
         updatedAt: true,
       });
 
-    db.run(
-      `UPDATE user_journeys SET ${personaFields}, updatedAt = CURRENT_TIMESTAMP WHERE id = ? RETURNING *`,
-      [...personaValues, id],
-      function (err) {
-        if (err) {
-          reply
-            .code(500)
-            .send({ message: "Error updating journey" + err.message });
-        }
-        reply.code(200).send("Journey updated successfully");
+    try {
+      const result = db.prepare(
+        `UPDATE user_journeys SET ${personaFields}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`
+      ).run(...personaValues, id);
+
+      if (result.changes === 0) {
+        return reply.code(404).send({ message: "Journey not found" });
       }
-    );
+      reply.code(200).send("Journey updated successfully");
+    } catch (err: any) {
+      reply.code(500).send({ message: "Error updating journey: " + err.message });
+    }
   });
 
   fastify.delete("/journeys/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
-    return new Promise((resolve, reject) => {
-      db.run(
-        "UPDATE user_journeys SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?",
-        [id],
-        function (err) {
-          if (err) {
-            reply.code(500).send({ message: "Error soft-deleting journey" });
-            reject(err);
-          }
-          if (this.changes === 0) {
-            reply.code(404).send({ message: "Journey not found" });
-            resolve(null);
-          }
-          reply
-            .code(200)
-            .send({ message: "Journey soft-deleted successfully" });
-          resolve({ message: "Journey soft-deleted successfully" });
-        }
-      );
-    });
+    try {
+      const result = db.prepare(
+        "UPDATE user_journeys SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?"
+      ).run(id);
+
+      if (result.changes === 0) {
+        reply.code(404).send({ message: "Journey not found" });
+        return;
+      }
+      
+      const response = { message: "Journey soft-deleted successfully" };
+      reply.code(200).send(response);
+      return response;
+    } catch (err: any) {
+      reply.code(500).send({ message: "Error soft-deleting journey" });
+      throw err;
+    }
   });
 
   fastify.put("/journeys/:id/restore", async (request, reply) => {
     const { id } = request.params as { id: string };
-    return new Promise((resolve, reject) => {
-      db.run(
-        "UPDATE user_journeys SET deletedAt = NULL, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
-        [id],
-        function (err) {
-          if (err) {
-            reply.code(500).send({ message: "Error restoring journey" });
-            reject(err);
-          }
-          if (this.changes === 0) {
-            reply.code(404).send({ message: "Journey not found" });
-            resolve(null);
-          }
-          reply.code(200).send({ message: "Journey restored successfully" });
-          resolve({ message: "Journey restored successfully" });
-        }
-      );
-    });
+    try {
+      const result = db.prepare(
+        "UPDATE user_journeys SET deletedAt = NULL, updatedAt = CURRENT_TIMESTAMP WHERE id = ?"
+      ).run(id);
+
+      if (result.changes === 0) {
+        reply.code(404).send({ message: "Journey not found" });
+        return;
+      }
+      
+      const response = { message: "Journey restored successfully" };
+      reply.code(200).send(response);
+      return response;
+    } catch (err: any) {
+      reply.code(500).send({ message: "Error restoring journey" });
+      throw err;
+    }
   });
 }

@@ -1,7 +1,11 @@
 import { Migrator } from "./migrator";
 import path from "path";
 
+import { fileURLToPath } from "url";
+
 const command = process.argv[2];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const migrator = new Migrator(path.join(__dirname, "migrations"));
 
 async function run() {

@@ -1,7 +1,7 @@
 import db from "./db";
 import fs from "fs";
 import path from "path";
-import { Database } from "sqlite3";
+import { Database } from "better-sqlite3";
 
 export interface Migration {
   id: number;
@@ -28,18 +28,11 @@ export class Migrator {
     `);
   }
 
-  private getAppliedMigrations() {
-    return new Promise<Set<number>>((resolve, reject) => {
-      db.all(
-        "SELECT id FROM migrations",
-        function (err, rows: { id: number }[]) {
-          if (err) {
-            reject(err);
-          }
-          resolve(new Set(rows.map((row) => row.id)));
-        }
-      );
-    });
+  private getAppliedMigrations(): Set<number> {
+    const rows = db.prepare("SELECT id FROM migrations").all() as {
+      id: number;
+    }[];
+    return new Set(rows.map((row) => row.id));
   }
 
   private async loadMigrations(): Promise<Migration[]> {
@@ -50,16 +43,17 @@ export class Migrator {
 
     const migrations: Migration[] = [];
     for (const file of files) {
-      const migration = await import(path.join(this.migrationsPath, file));
-
-      migrations.push(migration.migration);
+      const migrationModule = await import(
+        path.join(this.migrationsPath, file)
+      );
+      migrations.push(migrationModule.migration);
     }
 
     return migrations;
   }
 
   async runMigrations() {
-    const appliedMigrations = await this.getAppliedMigrations();
+    const appliedMigrations = this.getAppliedMigrations();
     const migrations = await this.loadMigrations();
 
     console.log(`Loaded ${migrations.length} migrations`);
@@ -76,20 +70,21 @@ export class Migrator {
     for (const migration of pendingMigrations) {
       console.log(`Running migration ${migration.id}: ${migration.name}`);
 
-      db.exec("BEGIN TRANSACTION");
-      try {
+      const transaction = db.transaction(() => {
         migration.up(db);
         db.prepare("INSERT INTO migrations (id, name) VALUES (?, ?)").run(
           migration.id,
           migration.name
         );
-        db.exec("COMMIT");
+      });
+
+      try {
+        transaction();
+        console.log(`✓ Migration ${migration.id} completed`);
       } catch (err) {
-        db.exec("ROLLBACK");
+        console.error(`Error running migration ${migration.id}:`, err);
         throw err;
       }
-
-      console.log(`✓ Migration ${migration.id} completed`);
     }
   }
 
@@ -97,7 +92,7 @@ export class Migrator {
     const appliedMigrations = this.getAppliedMigrations();
     const migrations = await this.loadMigrations();
 
-    const lastApplied = Math.max(...(await appliedMigrations));
+    const lastApplied = Math.max(...Array.from(appliedMigrations));
     const migration = migrations.find((m) => m.id === lastApplied);
 
     if (!migration) {
@@ -107,8 +102,17 @@ export class Migrator {
 
     console.log(`Rolling back migration ${migration.id}: ${migration.name}`);
 
-    db.run("DELETE FROM migrations WHERE id = ?", migration.id);
+    const transaction = db.transaction(() => {
+      migration.down(db);
+      db.prepare("DELETE FROM migrations WHERE id = ?").run(migration.id);
+    });
 
-    console.log(`✓ Rollback completed`);
+    try {
+      transaction();
+      console.log(`✓ Rollback completed`);
+    } catch (err) {
+      console.error(`Error rolling back migration ${migration.id}:`, err);
+      throw err;
+    }
   }
 }

@@ -70,134 +70,106 @@ export default async function imageRoutes(fastify: FastifyInstance) {
 
     const imageId = randomID();
 
-    return new Promise((resolve, reject) => {
-      db.run(
-        "INSERT INTO images (id, imageData, originalImage, filename, mimeType, size, altText) VALUES (?, ?, ?, ?, ?, ?,?)",
-        [
+    try {
+      const transaction = db.transaction(() => {
+        db.prepare(
+          "INSERT INTO images (id, imageData, originalImage, filename, mimeType, size, altText) VALUES (?, ?, ?, ?, ?, ?,?)"
+        ).run(
           imageId,
           processedImage,
           imageData,
-          file.filename,
+          file!.filename,
           finalMimeType,
-          file.file.bytesRead,
-          altText,
-        ],
-        function (err) {
-          if (err) {
-            console.error("Error inserting image:", err);
-            reply.code(500).send({ message: "Error uploading image." });
-            reject(err);
-            return;
-          }
+          file!.file.bytesRead,
+          altText
+        );
 
-          db.run(
-            "UPDATE steps SET imageId = ? WHERE id = ?",
-            [imageId, stepId],
-            function (err) {
-              if (err) {
-                console.error("Error updating step with imageId:", err);
-                reply.code(500).send({ message: "Error updating step." });
-                reject(err);
-                return;
-              }
+        db.prepare("UPDATE steps SET imageId = ? WHERE id = ?").run(
+          imageId,
+          stepId
+        );
+      });
 
-              db.get(
-                "SELECT journeyId FROM steps WHERE id = ?",
-                [stepId],
-                (err, row: { journeyId: string }) => {
-                  if (err) {
-                    console.error("Error fetching journeyId:", err);
-                    reply
-                      .code(500)
-                      .send({ message: "Error fetching journeyId." });
-                    reject(err);
-                    return;
-                  }
-                  if (!row) {
-                    reply.code(404).send({ message: "Step not found." });
-                    resolve(null);
-                    return;
-                  }
-                  reply.code(200).send({
-                    message: "Image uploaded and step updated successfully.",
-                    imageId: imageId,
-                    journeyId: row.journeyId,
-                  });
-                  resolve({
-                    message: "Image uploaded and step updated successfully.",
-                    imageId: imageId,
-                    journeyId: row.journeyId,
-                  });
-                }
-              );
-            }
-          );
-        }
-      );
-    });
+      transaction();
+
+      const row = db
+        .prepare("SELECT journeyId FROM steps WHERE id = ?")
+        .get(stepId) as { journeyId: string } | undefined;
+
+      if (!row) {
+        return reply.code(404).send({ message: "Step not found." });
+      }
+
+      const response = {
+        message: "Image uploaded and step updated successfully.",
+        imageId: imageId,
+        journeyId: row.journeyId,
+      };
+      reply.code(200).send(response);
+      return response;
+    } catch (err: any) {
+      console.error("Error uploading image:", err);
+      reply.code(500).send({ message: "Error uploading image." });
+    }
   });
 
   fastify.delete("/images/:imageId", async (request, reply) => {
-    const { stepId, imageId } = request.params as {
-      stepId: string;
+    const { imageId } = request.params as {
       imageId: string;
     };
 
-    return new Promise((resolve, reject) => {
-      db.run("UPDATE steps SET imageId = NULL WHERE imageId= ?", [imageId]);
-      db.run(
-        "UPDATE images SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?",
-        [imageId, stepId],
-        function (err) {
-          if (err) {
-            reply.code(500).send({ message: "Error soft-deleting image" });
-            reject(err);
-          }
-          if (this.changes === 0) {
-            reply
-              .code(404)
-              .send({ message: "Image not found or already deleted" });
-            resolve(null);
-          }
-          reply.code(200).send({ message: "Image soft-deleted successfully" });
-          resolve({ message: "Image soft-deleted successfully" });
-        }
-      );
-    });
+    try {
+      const transaction = db.transaction(() => {
+        db.prepare("UPDATE steps SET imageId = NULL WHERE imageId= ?").run(
+          imageId
+        );
+        return db
+          .prepare(
+            "UPDATE images SET deletedAt = CURRENT_TIMESTAMP WHERE id = ?"
+          )
+          .run(imageId);
+      });
+
+      const result = transaction();
+
+      if (result.changes === 0) {
+        return reply
+          .code(404)
+          .send({ message: "Image not found or already deleted" });
+      }
+
+      const response = { message: "Image soft-deleted successfully" };
+      reply.code(200).send(response);
+      return response;
+    } catch (err: any) {
+      console.error("Error deleting image:", err);
+      reply.code(500).send({ message: "Error soft-deleting image" });
+    }
   });
 
   fastify.get("/images/:imageId", async (request, reply) => {
     const { imageId } = request.params as { imageId: string };
 
-    return new Promise((resolve, reject) => {
-      db.get(
-        "SELECT imageData, mimeType, filename FROM images WHERE id = ? AND deletedAt IS NULL",
-        [imageId],
-        (
-          err,
-          row: { imageData: Buffer; mimeType: string; filename: string }
-        ) => {
-          if (err) {
-            console.error("Error fetching image:", err);
-            reply.code(500).send({ message: "Error fetching image." });
-            reject(err);
-            return;
-          }
-          if (!row) {
-            reply.code(404).send({ message: "Image not found." });
-            resolve(null);
-            return;
-          }
+    try {
+      const row = db
+        .prepare(
+          "SELECT imageData, mimeType, filename FROM images WHERE id = ? AND deletedAt IS NULL"
+        )
+        .get(imageId) as
+        | { imageData: Buffer; mimeType: string; filename: string }
+        | undefined;
 
-          reply.header("Content-Type", row.mimeType);
-          reply.header(
-            "Content-Disposition",
-            `inline; filename="${row.filename}"`
-          );
-          reply.send(row.imageData);
-          resolve(row.imageData);
-        }
-      );
-    });
+      if (!row) {
+        return reply.code(404).send({ message: "Image not found." });
+      }
+
+      reply.header("Content-Type", row.mimeType);
+      reply.header("Content-Disposition", `inline; filename="${row.filename}"`);
+      reply.send(row.imageData);
+      return row.imageData;
+    } catch (err: any) {
+      console.error("Error fetching image:", err);
+      reply.code(500).send({ message: "Error fetching image." });
+    }
   });
 }

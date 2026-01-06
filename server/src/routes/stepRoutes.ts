@@ -8,63 +8,39 @@ export default async function stepRoutes(fastify: FastifyInstance) {
       journeyId: string;
     };
 
-    const newStepId = await new Promise<string>((resolve, reject) => {
-      const id = randomID();
-      db.run(
-        "INSERT INTO steps (id, journeyID, name) VALUES (?,?,?)",
-        [id, journeyId, "New Step"],
-        function (err) {
-          if (err) {
-            return reject(err);
-          }
-          resolve(id);
-        }
+    const id = randomID();
+    try {
+      db.prepare("INSERT INTO steps (id, journeyID, name) VALUES (?,?,?)").run(
+        id,
+        journeyId,
+        "New Step"
       );
-    });
 
-    // Fetch the current orderedStepIds from the journey
-    interface JourneyOrderedSteps {
-      orderedStepIds: string;
-    }
-
-    const journey = await new Promise<JourneyOrderedSteps | undefined>(
-      (resolve, reject) => {
-        db.get(
-          "SELECT orderedStepIds FROM user_journeys WHERE id = ?",
-          [journeyId],
-          (err, row: JourneyOrderedSteps | undefined) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(row);
-          }
-        );
+      // Fetch the current orderedStepIds from the journey
+      interface JourneyOrderedSteps {
+        orderedStepIds: string;
       }
-    );
 
-    let orderedStepIds: string[] = [];
-    if (journey && journey.orderedStepIds) {
-      orderedStepIds = JSON.parse(journey.orderedStepIds);
+      const journey = db
+        .prepare("SELECT orderedStepIds FROM user_journeys WHERE id = ?")
+        .get(journeyId) as JourneyOrderedSteps | undefined;
+
+      let orderedStepIds: string[] = [];
+      if (journey && journey.orderedStepIds) {
+        orderedStepIds = JSON.parse(journey.orderedStepIds);
+      }
+      orderedStepIds.push(id);
+
+      // Update the journey with the new orderedStepIds
+      db.prepare(
+        "UPDATE user_journeys SET orderedStepIds = ? WHERE id = ?"
+      ).run(JSON.stringify(orderedStepIds), journeyId);
+
+      return reply.code(201).send({ id, message: "Step created successfully" });
+    } catch (err: any) {
+      console.error("Error creating step:", err);
+      reply.code(500).send({ message: "Error creating step" });
     }
-    orderedStepIds.push(newStepId);
-
-    // Update the journey with the new orderedStepIds
-    await new Promise<void>((resolve, reject) => {
-      db.run(
-        "UPDATE user_journeys SET orderedStepIds = ? WHERE id = ?",
-        [JSON.stringify(orderedStepIds), journeyId],
-        function (err) {
-          if (err) {
-            return reject(err);
-          }
-          resolve();
-        }
-      );
-    });
-
-    return reply
-      .code(201)
-      .send({ id: newStepId, message: "Step created successfully" });
   });
 
   fastify.put("/journeys/:journeyId/steps/:stepId", async (request, reply) => {
@@ -82,7 +58,7 @@ export default async function stepRoutes(fastify: FastifyInstance) {
     };
 
     const fields: string[] = [];
-    const values: (string | object)[] = [];
+    const values: any[] = [];
 
     if (name !== undefined) {
       fields.push("name = ?");
@@ -110,27 +86,25 @@ export default async function stepRoutes(fastify: FastifyInstance) {
       return;
     }
 
-    const changes = await new Promise<number>((resolve, reject) => {
-      db.run(
-        `UPDATE steps SET ${fields.join(
-          ", "
-        )}, updatedAt = CURRENT_TIMESTAMP WHERE id = ? AND journeyId = ?`,
-        [...values, stepId, journeyId],
-        function (err) {
-          if (err) {
-            return reject(err);
-          }
-          resolve(this.changes);
-        }
-      );
-    });
+    try {
+      const result = db
+        .prepare(
+          `UPDATE steps SET ${fields.join(
+            ", "
+          )}, updatedAt = CURRENT_TIMESTAMP WHERE id = ? AND journeyId = ?`
+        )
+        .run(...values, stepId, journeyId);
 
-    if (changes === 0) {
-      return reply.code(404).send({
-        message: "Step not found or does not belong to the specified journey",
-      });
+      if (result.changes === 0) {
+        return reply.code(404).send({
+          message: "Step not found or does not belong to the specified journey",
+        });
+      }
+      return reply.code(200).send({ message: "Step updated successfully" });
+    } catch (err: any) {
+      console.error("Error updating step:", err);
+      reply.code(500).send({ message: "Error updating step" });
     }
-    return reply.code(200).send({ message: "Step updated successfully" });
   });
 
   fastify.delete("/steps/:stepId", async (request, reply) => {
@@ -138,20 +112,18 @@ export default async function stepRoutes(fastify: FastifyInstance) {
       stepId: string;
     };
 
-    const changes = await new Promise<number>((resolve, reject) => {
-      db.run("DELETE from steps WHERE id = ?", [stepId], function (err) {
-        if (err) {
-          return reject(err);
-        }
-        resolve(this.changes);
-      });
-    });
-    if (changes === 0) {
-      return reply.code(404).send({
-        message: "Step not found or does not belong to the specified journey",
-      });
+    try {
+      const result = db.prepare("DELETE from steps WHERE id = ?").run(stepId);
+      if (result.changes === 0) {
+        return reply.code(404).send({
+          message: "Step not found or does not belong to the specified journey",
+        });
+      }
+      return reply.code(200).send({ message: "Step deleted successfully" });
+    } catch (err: any) {
+      console.error("Error deleting step:", err);
+      reply.code(500).send({ message: "Error deleting step" });
     }
-    return reply.code(200).send({ message: "Step deleted successfully" });
   });
 
   fastify.delete(
@@ -162,27 +134,26 @@ export default async function stepRoutes(fastify: FastifyInstance) {
         insightId: string;
       };
 
-      const changes = await new Promise<number>((resolve, reject) => {
-        db.run(
-          "DELETE from step_connections WHERE stepId = ? AND attributeID = ?",
-          [stepId, insightId],
-          function (err) {
-            if (err) {
-              return reject(err);
-            }
-            resolve(this.changes);
-          }
-        );
-      });
-      if (changes === 0) {
-        return reply.code(404).send({
-          message:
-            "Step connections not found or does not belong to the specified step",
-        });
+      try {
+        const result = db
+          .prepare(
+            "DELETE from step_connections WHERE stepId = ? AND attributeID = ?"
+          )
+          .run(stepId, insightId);
+
+        if (result.changes === 0) {
+          return reply.code(404).send({
+            message:
+              "Step connections not found or does not belong to the specified step",
+          });
+        }
+        return reply
+          .code(200)
+          .send({ message: "Step connections deleted successfully" });
+      } catch (err: any) {
+        console.error("Error deleting step connection:", err);
+        reply.code(500).send({ message: "Error deleting step connection" });
       }
-      return reply
-        .code(200)
-        .send({ message: "Step connections deleted successfully" });
     }
   );
 }

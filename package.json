@@ -1,7 +1,9 @@
 {
   "name": "journey",
   "version": "0.0.1",
+  "description": "Journey is a platform for creating and sharing user journeys.",
   "private": false,
+  "type": "module",
   "scripts": {
     "lint": "npm run frontend:lint && npm run backend:lint",
     "check": "npm run frontend:check && npm run backend:check",
