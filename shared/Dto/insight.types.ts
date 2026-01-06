@@ -1,4 +1,4 @@
-import type { InsightTypes } from "@shared/types";
+import type { InsightTypes } from "../types";
 
 export interface updateInsightDto {
   id: string;
