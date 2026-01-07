@@ -43,7 +43,6 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -69,7 +68,7 @@ export default function UserJourneysList<TData extends { id: string }, TValue>({
         />
         {actions}
       </div>
-      <div className="flex-auto overflow-scroll h-20 flex flex-col">
+      <div className="flex-auto h-20 flex flex-col">
         <Table
           className="h-full"
           data-empty={table.getRowModel().rows?.length === 0}

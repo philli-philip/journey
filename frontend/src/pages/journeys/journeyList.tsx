@@ -41,11 +41,16 @@ export default function UserJourneys() {
           <SidebarTrigger />
         </Button>
         <h1 className="font-semibold flex-1">Journeys</h1>
-        <Button onClick={handleCreateJourney} size="sm">
-          New Journey
-        </Button>
       </div>
-      <UserJourneyList columns={columns} data={journeys || []} />
+      <UserJourneyList
+        columns={columns}
+        data={journeys || []}
+        actions={
+          <Button onClick={handleCreateJourney} size="sm">
+            New Journey
+          </Button>
+        }
+      />
     </div>
   );
 }

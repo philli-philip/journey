@@ -165,7 +165,7 @@ export function InsightCell({
       )}
     >
       {items.length > 0 ? (
-        <div className="flex flex-col gap-0.5 p-1 pr-2 overflow-x-scroll">
+        <div className="flex flex-col gap-0.5 p-1 pr-2">
           {items.map((insight) => (
             <Link
               to={`?insight=${insight.id}&step=${stepId}`}
