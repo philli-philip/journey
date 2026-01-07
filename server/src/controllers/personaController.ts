@@ -1,4 +1,5 @@
 import { CreatePersonaDto, UpdatePersonaDto } from "@shared/Dto/persona.types";
+import { randomID } from "@shared/randomID";
 import { Persona } from "@shared/types";
 import db from "src/db/db";
 import { AppError, ConflictError } from "src/utils/errors";
@@ -6,11 +7,12 @@ import { buildFieldValueClause } from "src/utils/sql-helper";
 
 export async function createPersona(persona: CreatePersonaDto) {
   try {
+    const id = randomID(4);
     const result = db
       .prepare(
         "INSERT INTO personas (name, slug, description) VALUES (?, ?, ?) RETURNING *"
       )
-      .get(persona.name, persona.slug, persona.description || "");
+      .get(persona.name, `${persona.slug}-${id}`, persona.description || "");
 
     return result;
   } catch (err: any) {
