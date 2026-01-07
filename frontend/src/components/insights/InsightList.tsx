@@ -16,11 +16,13 @@ import UpdateInsightDrawer from "./updateInsightDrawer";
 interface InsightListProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  actions?: JSX.Element;
 }
 
 export default function InsightList<TData, TValue>({
   columns,
   data,
+  actions,
 }: InsightListProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -42,7 +44,7 @@ export default function InsightList<TData, TValue>({
 
   return (
     <>
-      <div className="flex items-center py-4 border-b">
+      <div className="flex items-center py-4 border-b pr-2 justify-between">
         <Input
           placeholder="Filter names..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
@@ -51,6 +53,7 @@ export default function InsightList<TData, TValue>({
           }
           className="max-w-2xs shadow-none ml-2"
         />
+        {actions}
       </div>
       <div className="flex-auto overflow-scroll h-20 flex flex-col">
         <Table className="min-w-full divide-y divide-gray-200 ">

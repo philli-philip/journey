@@ -25,29 +25,35 @@ export default function PersonaList() {
     return <Empty title="No personas found" />;
   }
 
+  const Actions = () => (
+    <Button
+      size="sm"
+      onClick={() =>
+        mutate(
+          { name: "New Persona", slug: "new-persona" },
+          {
+            onSuccess: () => toast.success("Persona created"),
+            onError: () => toast.error("Persona with this slug already exists"),
+          }
+        )
+      }
+    >
+      <PlusIcon size="16" />
+      New persona
+    </Button>
+  );
+
   return (
     <>
       <DetailHeader>
         <PageTitle title="Personas" />
         <HeaderTitle className="flex-1">Personas</HeaderTitle>
-        <Button
-          size="sm"
-          onClick={() =>
-            mutate(
-              { name: "New Persona", slug: "new-persona" },
-              {
-                onSuccess: () => toast.success("Persona created"),
-                onError: () =>
-                  toast.error("Persona with this slug already exists"),
-              }
-            )
-          }
-        >
-          <PlusIcon size="16" />
-          New persona
-        </Button>
       </DetailHeader>
-      <PersonTable columns={columns} data={personasList} />
+      <PersonTable
+        columns={columns}
+        data={personasList}
+        actions={<Actions />}
+      />
     </>
   );
 }

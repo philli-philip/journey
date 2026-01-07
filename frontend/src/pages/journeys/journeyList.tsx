@@ -6,6 +6,7 @@ import { Empty, EmptyTitle } from "@/components/ui/empty";
 import useAllJourneys from "@/hooks/useAllJourneys";
 import { useNavigate } from "react-router-dom";
 import { PageTitle } from "@/components/ui/page-title";
+import { Plus } from "lucide-react";
 
 export default function UserJourneys() {
   const { journeys, loading, error, createJourney } = useAllJourneys({
@@ -47,6 +48,7 @@ export default function UserJourneys() {
         data={journeys || []}
         actions={
           <Button onClick={handleCreateJourney} size="sm">
+            <Plus size="16" />
             New Journey
           </Button>
         }

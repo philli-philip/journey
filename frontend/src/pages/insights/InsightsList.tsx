@@ -34,9 +34,12 @@ export default function InsightsPage() {
       <PageTitle title="Insights" />
       <DetailHeader>
         <HeaderTitle className="flex-1">Insights</HeaderTitle>
-        <CreateInsightDrawer />
       </DetailHeader>
-      <InsightList columns={columns} data={data || []} />
+      <InsightList
+        columns={columns}
+        data={data || []}
+        actions={<CreateInsightDrawer />}
+      />
     </>
   );
 }

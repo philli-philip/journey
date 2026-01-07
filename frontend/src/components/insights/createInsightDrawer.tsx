@@ -9,7 +9,7 @@ import {
   DrawerTrigger,
 } from "../ui/drawer";
 import { Button } from "../ui/button";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import { insightTypes, type InsightTypes } from "@shared/types";
@@ -38,7 +38,10 @@ export default function CreateInsightDrawer() {
     >
       <DrawerTrigger>
         <Button asChild size="sm">
-          <Link to="?panel=create-insight">New insight</Link>
+          <Link to="?panel=create-insight">
+            <Plus size="16" />
+            New insight
+          </Link>
         </Button>
       </DrawerTrigger>
       <DrawerContent>

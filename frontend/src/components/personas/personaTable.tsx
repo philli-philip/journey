@@ -16,11 +16,13 @@ import type { Persona } from "@shared/types";
 interface DataTableProps<TData extends Persona, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  actions?: JSX.Element;
 }
 
 export default function PersonasTable<TData extends Persona, TValue>({
   columns,
   data,
+  actions,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     columns,
@@ -31,7 +33,7 @@ export default function PersonasTable<TData extends Persona, TValue>({
 
   return (
     <>
-      <div className="flex flex-row items-center p-0.5 py-4 border-b">
+      <div className="flex flex-row items-center p-0.5 py-4 border-b pr-2 justify-between">
         <Input
           placeholder="Search personas..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -40,6 +42,7 @@ export default function PersonasTable<TData extends Persona, TValue>({
           }
           className="max-w-2xs shadow-none ml-2"
         />
+        {actions}
       </div>
       {table.getFilteredRowModel().rows.length === 0 &&
         table.getCoreRowModel().rows.length > 0 &&
