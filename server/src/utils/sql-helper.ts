@@ -30,8 +30,6 @@ export function buildFieldValueClause({
     fields.push("updatedAt = CURRENT_TIMESTAMP");
   }
 
-  console.log(fields);
-  console.log(values);
   const mergedFields = fields.join(", ");
   return { fields: mergedFields, values };
 }
