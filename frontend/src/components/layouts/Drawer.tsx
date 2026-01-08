@@ -9,6 +9,7 @@ import {
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
+import { useKeyShortCut } from "@/hooks/useShortCut";
 
 export default function PreparedDrawer({
   title = "New drawer",
@@ -24,6 +25,15 @@ export default function PreparedDrawer({
   onClose?: () => void;
 }) {
   const [, setSearchParams] = useSearchParams();
+  useKeyShortCut("Escape", () => {
+    console.log("");
+    if (onClose) {
+      onClose();
+    } else {
+      setSearchParams({});
+    }
+  });
+
   return (
     <Drawer direction="right" dismissible={true} open={open}>
       <DrawerContent>
