@@ -72,7 +72,11 @@ function LinkInsight({ stepId, type }: { stepId: string; type: InsightTypes }) {
             onChange={(e) => setSearchValue(e.target.value)}
             className="border p-2 shadow-xs"
           />
-          <Button size="icon" variant="outline">
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => setView("create")}
+          >
             <Plus size="16" />
             <span className="sr-only">Create {type}</span>
           </Button>
@@ -122,7 +126,7 @@ function LinkInsight({ stepId, type }: { stepId: string; type: InsightTypes }) {
       {view === "list" ? (
         <List insights={insights} />
       ) : (
-        <CreateInsightForm onSuccess={handleSucess} />
+        <CreateInsightForm onSuccess={handleSucess} defaultType={type} />
       )}
     </div>
   );
