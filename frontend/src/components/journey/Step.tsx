@@ -57,6 +57,7 @@ export default function StepComponent({
 
   const isDescriptionCollapsed = globalCollapsedState.description;
   const isPainPointCollapsed = globalCollapsedState.painPoints;
+  const isGainPointCollapsed = globalCollapsedState.gains;
   const isInsightsCollapsed = globalCollapsedState.observations;
   const isServicesCollapsed = globalCollapsedState.services;
   const isImageCollapsed = globalCollapsedState.image;
@@ -127,6 +128,19 @@ export default function StepComponent({
         />
       </Cell>
 
+      {/* Insights section*/}
+      <Cell open={!isInsightsCollapsed}>
+        <InsightCell
+          stepId={step.id}
+          type="observation"
+          items={
+            step.attributes.observations instanceof Array
+              ? step.attributes.observations
+              : []
+          }
+        />
+      </Cell>
+
       {/* Pain Point section*/}
       <Cell open={!isPainPointCollapsed}>
         <InsightCell
@@ -138,15 +152,13 @@ export default function StepComponent({
         />
       </Cell>
 
-      {/* Insights section*/}
-      <Cell open={!isInsightsCollapsed}>
+      {/* Gain Point section*/}
+      <Cell open={!isGainPointCollapsed}>
         <InsightCell
           stepId={step.id}
-          type="observation"
+          type="gain"
           items={
-            step.attributes.observations instanceof Array
-              ? step.attributes.observations
-              : []
+            step.attributes.pains instanceof Array ? step.attributes.pains : []
           }
         />
       </Cell>

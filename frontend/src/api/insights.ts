@@ -12,7 +12,7 @@ export async function getAllInsights(filter?: { type?: InsightTypes }) {
     throw new Error(errorData.message || "Failed to get insight");
   }
 
-  return response.json();
+  return (await response.json()) as Insight[];
 }
 
 export async function linkInsightToStep({
@@ -53,7 +53,7 @@ export async function createInsight(form: {
   title: string;
   type: string;
   description: string;
-}): Promise<{ id: string; title: string; type: InsightTypes } | Error> {
+}) {
   const response = await fetch(`${API_BASE_URL}/insights`, {
     method: "POST",
     headers: {
@@ -67,7 +67,7 @@ export async function createInsight(form: {
     return new Error(errorData.message || "Failed to create insight");
   }
 
-  return response.json();
+  return (await response.json()) as Insight;
 }
 
 export async function updateInsight(insight: updateInsightDto) {

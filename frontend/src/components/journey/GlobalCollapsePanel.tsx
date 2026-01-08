@@ -18,13 +18,18 @@ export const LayerPanel = () => {
       expandedHeight: "h-60",
     },
     {
+      key: "observations",
+      label: "Observations",
+      expandedHeight: "h-60",
+    },
+    {
       key: "painPoints",
       label: "Pain Points",
       expandedHeight: "h-60",
     },
     {
-      key: "observations",
-      label: "Observations",
+      key: "gains",
+      label: "Gains",
       expandedHeight: "h-60",
     },
     {

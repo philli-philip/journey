@@ -12,7 +12,7 @@ import { Button } from "../ui/button";
 import { Plus, X } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
-import { insightTypes, type InsightTypes } from "@shared/types";
+import { insightTypes, type Insight, type InsightTypes } from "@shared/types";
 import { toast } from "sonner";
 import { FieldError, FieldGroup, FieldLabel, Field } from "../ui/field";
 import { Input } from "../ui/input";
@@ -71,13 +71,19 @@ const formSchema = z.object({
   type: z.enum(insightTypes),
 });
 
-function CreateInsightForm() {
+export function CreateInsightForm({
+  onSuccess,
+  defaultType = "observation",
+}: {
+  onSuccess?: (insight: Insight) => void;
+  defaultType?: InsightTypes;
+}) {
   const [, setSearchParams] = useSearchParams();
   const query = useQueryClient();
   const form = useForm({
     defaultValues: {
       title: "",
-      type: "pain",
+      type: defaultType,
       description: "",
     },
     validators: {
@@ -87,6 +93,10 @@ function CreateInsightForm() {
       const insight = await createInsight(value);
       if (insight instanceof Error) {
         toast.error(insight.message);
+        return;
+      }
+      if (onSuccess) {
+        onSuccess(insight);
       } else {
         toast.success("Insight created successfully!");
         setSearchParams({});
@@ -138,7 +148,7 @@ function CreateInsightForm() {
                   <Select
                     name={field.name}
                     value={field.state.value}
-                    onValueChange={field.handleChange}
+                    onValueChange={(e) => field.handleChange(e as InsightTypes)}
                   >
                     <SelectTrigger id={field.name} aria-disabled={isInvalid}>
                       <SelectValue placeholder="Select insight type" asChild>
@@ -198,7 +208,7 @@ function CreateInsightForm() {
             >
               Cancel
             </Button>
-            <Button type="submit">Submit</Button>
+            <Button type="submit">Create</Button>
           </Field>
         </FieldGroup>
       </form>
