@@ -25,7 +25,7 @@ export default function PersonaList() {
     return <Empty title="No personas found" />;
   }
 
-  const Actions = () => (
+  const actions = (
     <Button
       size="sm"
       onClick={() =>
@@ -49,11 +49,7 @@ export default function PersonaList() {
         <PageTitle title="Personas" />
         <HeaderTitle className="flex-1">Personas</HeaderTitle>
       </DetailHeader>
-      <PersonTable
-        columns={columns}
-        data={personasList}
-        actions={<Actions />}
-      />
+      <PersonTable columns={columns} data={personasList} actions={actions} />
     </>
   );
 }

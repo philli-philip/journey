@@ -61,4 +61,5 @@ export interface Persona {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  imageId?: string;
 }

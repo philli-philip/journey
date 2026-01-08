@@ -9,17 +9,19 @@ export function buildFieldValueClause({
   updates,
   updatedAt = false,
 }: {
-  updates: Record<string, string | number | undefined | string[]>;
+  updates: Record<string, string | number | undefined | null | string[]>;
   updatedAt?: boolean;
 }) {
   const fields: string[] = [];
-  const values: (string | number)[] = [];
+  const values: (string | number | null)[] = [];
 
   for (const [key, value] of Object.entries(updates)) {
     if (value !== undefined) {
       fields.push(`${key} = ?`);
       if (Array.isArray(value)) {
         values.push(JSON.stringify(value));
+      } else if (value === null) {
+        values.push(null);
       } else {
         values.push(value);
       }

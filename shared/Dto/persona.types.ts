@@ -9,5 +9,6 @@ export interface UpdatePersonaDto {
   changes: {
     name?: string;
     description?: string;
+    imageId?: string | null;
   };
 }

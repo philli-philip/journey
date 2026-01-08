@@ -1,13 +1,11 @@
-import { cn } from "@/lib/utils";
+import { cn, imageURI } from "@/lib/utils";
 import React, { useState, useRef } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { uploadImage, deleteImage } from "../../api/images";
 import { Button } from "../ui/button";
 import { Plus, Trash } from "lucide-react";
 import type { InsightTypes } from "@shared/types";
 import { Link, useSearchParams } from "react-router-dom";
 import { InsightIcon } from "../insights/insight-icons";
-import { API_BASE_URL } from "@shared/constants";
+import { useImage } from "@/hooks/useImages";
 
 export function ImageCell({
   imageId,
@@ -18,6 +16,7 @@ export function ImageCell({
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadImageMutation, deleteImageMutation } = useImage();
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -49,25 +48,6 @@ export function ImageCell({
       e.dataTransfer.clearData();
     }
   };
-
-  const queryClient = useQueryClient();
-
-  const uploadImageMutation = useMutation({
-    mutationFn: ({ file, stepId }: { file: File; stepId: string }) =>
-      uploadImage(file, stepId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["journey"],
-      });
-    },
-  });
-
-  const deleteImageMutation = useMutation({
-    mutationFn: (imageId: string) => deleteImage(imageId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journey"] });
-    },
-  });
 
   const handleUpload = (files: FileList) => {
     if (files.length > 0) {
@@ -106,7 +86,7 @@ export function ImageCell({
       {imageId ? (
         <div className="relative group aspect-video w-full items-center flex flex-col">
           <img
-            src={`${API_BASE_URL}/images/${imageId}`}
+            src={imageURI(imageId)}
             alt={""}
             className="object-contain max-h-full border rounded-sm"
           />

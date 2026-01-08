@@ -26,7 +26,7 @@ export async function updateStep({ id, changes }: updateStepDto) {
   const item = await db
     .prepare(`UPDATE steps ${fields} where id = ? RETURINING *`)
     .get(values, id);
-  return item;
+  return item as Step;
 }
 
 export async function deleteStep(id: string) {

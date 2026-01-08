@@ -23,7 +23,7 @@ export default function PersonaJourneys() {
     return <Empty title="No journey linked to this persona" />;
   }
 
-  const Actions = () => (
+  const actions = (
     <Button size="sm" onClick={() => createJourney({ personaSlugs: [slug] })}>
       New journey
     </Button>
@@ -33,14 +33,12 @@ export default function PersonaJourneys() {
     return (
       <Empty>
         <EmptyTitle>No user journeys link to persona</EmptyTitle>
-        <EmptyContent>
-          <Actions />
-        </EmptyContent>
+        <EmptyContent>{actions}</EmptyContent>
       </Empty>
     );
   }
 
   return (
-    <UserJourneyList columns={columns} data={journeys} actions={<Actions />} />
+    <UserJourneyList columns={columns} data={journeys} actions={actions} />
   );
 }

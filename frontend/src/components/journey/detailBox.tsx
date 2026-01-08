@@ -55,11 +55,10 @@ function PersonaEdit({
         <Button asChild variant="ghost" size="sm" className="-mt-2 -ml-3">
           <span>
             {selectedPersonas.length === 0 ? (
-              <span className="text-muted-foreground">
-                Select Personas
-              </span>
+              <span className="text-muted-foreground">Select Personas</span>
             ) : (
-              allPersonas?.find((p) => selectedPersonas.includes(p.slug))?.name +
+              allPersonas?.find((p) => selectedPersonas.includes(p.slug))
+                ?.name +
               (selectedPersonas.length > 1
                 ? " + " + (selectedPersonas.length - 1)
                 : "")

@@ -8,7 +8,8 @@ import {
   insertImage,
   processImage,
 } from "src/controllers/imageController";
-import { Step } from "@shared/types";
+import { updatePersona } from "src/controllers/personaController";
+import { updateStep } from "src/controllers/stepController";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -28,6 +29,7 @@ export default async function imageRoutes(fastify: FastifyInstance) {
   fastify.post("/images", async (request, reply) => {
     let file: MultipartFile | undefined;
     let stepId: string | undefined;
+    let personaSlug: string | undefined;
     let altText: string | undefined;
     let imageData: Buffer | undefined;
     let finalMimeType = "image/jpeg";
@@ -41,6 +43,9 @@ export default async function imageRoutes(fastify: FastifyInstance) {
         if (part.fieldname === "stepId") {
           stepId = part.value as string;
         }
+        if (part.fieldname === "personaSlug") {
+          personaSlug = part.value as string;
+        }
       }
     }
 
@@ -49,7 +54,7 @@ export default async function imageRoutes(fastify: FastifyInstance) {
       return;
     }
 
-    if (!stepId) {
+    if (!stepId && !personaSlug) {
       reply.code(400).send({ message: "stepId is required." });
       return;
     }
@@ -64,16 +69,32 @@ export default async function imageRoutes(fastify: FastifyInstance) {
       altText
     );
 
-    const step = (await db
-      .prepare("UPDATE steps SET imageId = ? WHERE id = ? RETURNING *")
-      .get(imageId, stepId)) as Step;
+    console.log("Image id", imageId);
+    if (stepId) {
+      const step = await updateStep({ id: stepId, changes: { imageId } });
 
-    const response = {
-      message: "Image uploaded and step updated successfully.",
-      imageId: imageId,
-      journeyId: step.journeyId,
-    };
-    reply.send(response);
+      reply.send({
+        message: "Image uploaded and step updated successfully.",
+        imageId: imageId,
+        journeyId: step.journeyId,
+      });
+    } else if (personaSlug) {
+      const item = await updatePersona({
+        slug: personaSlug,
+        changes: { imageId },
+      });
+
+      reply.send({
+        message: "Image uploaded and persona updated.",
+        imageId: imageId,
+        personaSlug: item.slug,
+      });
+    } else {
+      reply.send({
+        message: "Image uploaded",
+        imageId,
+      });
+    }
   });
 
   fastify.delete("/images/:imageId", async (request, reply) => {

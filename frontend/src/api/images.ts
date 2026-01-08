@@ -1,8 +1,18 @@
 import { API_BASE_URL } from "@shared/constants";
 
-export async function uploadImage(file: File, stepId: string): Promise<void> {
+export async function uploadImage(
+  file: File,
+  stepId?: string,
+  personaSlug?: string
+): Promise<void> {
   const formData = new FormData();
-  formData.append("stepId", stepId);
+
+  if (stepId) {
+    formData.append("stepId", stepId);
+  }
+  if (personaSlug) {
+    formData.append("personaSlug", personaSlug);
+  }
   formData.append("file", file);
 
   const response = await fetch(`${API_BASE_URL}/images`, {

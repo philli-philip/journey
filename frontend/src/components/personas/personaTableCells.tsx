@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { MoreVerticalIcon } from "lucide-react";
 import { DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
 import { deletePersona } from "@/api/personas";
+import { imageURI } from "@/lib/utils";
 
 export const ActionCell = ({ row }: { row: Row<Persona> }) => {
   const persona = row.original;
@@ -42,5 +43,20 @@ export const ActionCell = ({ row }: { row: Row<Persona> }) => {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+};
+
+export const AvatarCell = ({ row }: { row: Row<Persona> }) => {
+  const { imageId } = row.original;
+
+  return (
+    <span className="flex flex-row gap-2 items-center">
+      {imageId ? (
+        <img src={imageURI(imageId)} className="size-6 rounded-full" />
+      ) : (
+        <div className="size-6 rounded-full bg-stone-100" />
+      )}
+      <span className="font-medium">{row.original.name}</span>
+    </span>
   );
 };
