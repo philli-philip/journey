@@ -142,7 +142,6 @@ export default function PersonaDetails() {
           />
         </div>
         <Input
-          autoFocus
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           onBlur={handleTitleUpdate}
