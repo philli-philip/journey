@@ -111,7 +111,7 @@ export default function PersonaDetails() {
 
   return (
     <div className="bg-neutral-100 w-full grow h-10 overflow-x-scroll pt-20">
-      <div className="grow relative px-4 mx-auto max-w-4xl bg-card shadow-sm rounded-xl pt-24">
+      <div className="grow relative px-4 mx-auto max-w-4xl bg-card shadow-sm rounded-xl pt-24 mb-32">
         <div className="size-32 bg-card rounded-full border shadow-sm -top-16 absolute z-10 flex flex-rol items-center justify-center">
           {persona.imageId ? (
             <div className="group relative">
