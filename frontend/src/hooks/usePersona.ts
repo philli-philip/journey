@@ -3,6 +3,7 @@ import {
   deletePersona,
   getPersona,
   getPersonas,
+  restorePersona,
   updatePersona,
 } from "@/api/personas";
 import type {
@@ -10,6 +11,7 @@ import type {
   UpdatePersonaDto,
 } from "@shared/Dto/persona.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const usePersonaQuery = (slug: string) => {
   return useQuery({
@@ -61,6 +63,18 @@ export const useUpdatePersonaMutation = () => {
     },
     onError: (error) => {
       console.error("Error updating persona:", error);
+    },
+  });
+};
+
+export const useRestorePersonaMutation = () => {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (slug: string) => restorePersona(slug),
+    onSuccess: () => client.invalidateQueries({ queryKey: ["personas"] }),
+    onError: (error) => {
+      toast.error("Error restoring persona");
+      console.log(error.message);
     },
   });
 };

@@ -68,3 +68,11 @@ export async function updatePersona(updates: UpdatePersonaDto) {
 
   return result as Persona;
 }
+
+export async function restorePersona(slug: string) {
+  const result = db
+    .prepare("UPDATE personas SET deletedAT = NULL WHERE slug = ? RETURNING *")
+    .get(slug) as Persona;
+
+  return result;
+}

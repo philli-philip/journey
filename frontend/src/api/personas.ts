@@ -7,7 +7,7 @@ import { API_BASE_URL } from "@shared/constants";
 
 export async function getPersonas() {
   const response = await fetch(`${API_BASE_URL}/personas`);
-  
+
   if (!response.ok) {
     throw new Error(response.statusText);
   }
@@ -55,7 +55,7 @@ export async function deletePersona(id: string) {
       const error = await response.json();
       throw new Error(error.message || "Failed to delete persona");
     }
-    const data: { message: string; slug: string } = await response.json();
+    const data = (await response.json()) as Persona;
     return data.slug;
   } catch (error) {
     throw new Error(
@@ -81,6 +81,25 @@ export async function updatePersona(persona: UpdatePersonaDto) {
     }
     const updatedPersona: Persona = await response.json();
     return updatedPersona;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : "Error while processing the response"
+    );
+  }
+}
+export async function restorePersona(slug: string) {
+  const response = await fetch(`${API_BASE_URL}/personas/${slug}/restore`, {
+    method: "PUT",
+  });
+  try {
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to restore persona");
+    }
+    const persona = await response.json();
+    return persona as Persona;
   } catch (error) {
     throw new Error(
       error instanceof Error

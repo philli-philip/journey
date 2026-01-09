@@ -5,6 +5,7 @@ import {
   deletePersona,
   getPersona,
   getPersonas,
+  restorePersona,
   updatePersona,
 } from "src/controllers/personaController";
 
@@ -26,15 +27,21 @@ export default async function personaRoutes(fastify: FastifyInstance) {
     reply.send(result);
   });
 
-  fastify.delete("/personas/:slug", (req, reply) => {
+  fastify.delete("/personas/:slug", async (req, reply) => {
     const { slug } = req.params as { slug: string };
-    const result = deletePersona(slug);
+    const result = await deletePersona(slug);
     reply.send(result);
   });
 
   fastify.put("/personas", (req, reply) => {
     const { slug, changes } = req.body as UpdatePersonaDto;
     const result = updatePersona({ slug, changes });
+    reply.send(result);
+  });
+
+  fastify.put("/personas/:id/restore", async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const result = await restorePersona(id);
     reply.send(result);
   });
 }

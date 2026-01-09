@@ -8,11 +8,17 @@ import type { Row } from "@tanstack/react-table";
 import { Button } from "../ui/button";
 import { MoreVerticalIcon } from "lucide-react";
 import { DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
-import { deletePersona } from "@/api/personas";
 import { imageURI } from "@/lib/utils";
+import {
+  useDeletePersonaMutation,
+  useRestorePersonaMutation,
+} from "@/hooks/usePersona";
+import { toast } from "sonner";
 
 export const ActionCell = ({ row }: { row: Row<Persona> }) => {
   const persona = row.original;
+  const { mutate: deletePersona } = useDeletePersonaMutation();
+  const { mutate: restorPersona } = useRestorePersonaMutation();
   const queryClient = useQueryClient();
   return (
     <DropdownMenu>
@@ -33,7 +39,17 @@ export const ActionCell = ({ row }: { row: Row<Persona> }) => {
         <DropdownMenuItem
           onClick={async (e) => {
             e.stopPropagation();
-            await deletePersona(persona.slug);
+            deletePersona(persona.slug, {
+              onSuccess: (slug) => {
+                console.log(slug);
+                toast.success("Persona deleted.", {
+                  action: {
+                    label: "Undo",
+                    onClick: () => restorPersona(slug),
+                  },
+                });
+              },
+            });
             queryClient.invalidateQueries({
               queryKey: ["personas"],
             });
