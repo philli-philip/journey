@@ -207,11 +207,12 @@ export default function StepComponent({
       {/* Services section*/}
       <Cell open={!isServicesCollapsed}>
         <textarea
-          className="w-full rounded-md p-2 text-sm focus:outline-none resize-none"
+          className="w-full rounded-md p-2 text-sm focus:outline-none resize-none placeholder:text-transparent duration-75 hover:placeholder:text-muted-foreground cursor-pointer"
           value={services}
           onChange={(e) => setServices(e.target.value)}
           onBlur={(e) => stepMutation.mutate({ services: e.target.value })}
           disabled={isServicesCollapsed}
+          placeholder="Add dependencies ..."
         />
       </Cell>
     </div>

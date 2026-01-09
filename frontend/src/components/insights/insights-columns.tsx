@@ -65,7 +65,7 @@ export const getColumns = (
             <DropdownMenuItem
               className="cursor-pointer "
               onClick={async (event) => {
-                event.preventDefault();
+                event.stopPropagation();
                 await deleteInsight(insight.id);
                 query.invalidateQueries({ queryKey: ["insights"] });
               }}
