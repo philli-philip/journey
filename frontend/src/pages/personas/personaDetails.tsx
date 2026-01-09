@@ -1,11 +1,12 @@
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { Button } from "@/components/ui/button";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useImage } from "@/hooks/useImages";
 import { useUpdatePersonaMutation, usePersonaQuery } from "@/hooks/usePersona";
 import { imageURI } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { Edit, Trash, UploadCloudIcon } from "lucide-react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function PersonaDetails() {
@@ -79,16 +80,24 @@ export default function PersonaDetails() {
 
   const { mutate } = useUpdatePersonaMutation();
 
-  const handleDescriptionChange = (newDescription: string) => {
-    if (slug) {
-      mutate({
-        slug: slug,
-        changes: {
-          description: newDescription,
-        },
-      });
-    }
-  };
+  const debouncedHandleDescriptionChange = useCallback(
+    (newDescription: string) => {
+      if (slug) {
+        mutate({
+          slug: slug,
+          changes: {
+            description: newDescription,
+          },
+        });
+      }
+    },
+    [slug, mutate]
+  );
+
+  const handleDescriptionChange = useDebounce(
+    debouncedHandleDescriptionChange,
+    3000
+  );
 
   if (!persona) {
     return;

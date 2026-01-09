@@ -1,8 +1,10 @@
 import { Empty, EmptyTitle } from "@/components/ui/empty";
 import useJourney from "@/hooks/useJourney";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useParams } from "react-router-dom";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import DetailBox from "@/components/journey/detailBox";
+import { useCallback } from "react";
 
 export default function JourneyOverview() {
   const journeyId = useParams().journeyId;
@@ -35,14 +37,19 @@ export default function JourneyOverview() {
     );
   }
 
-  const handleDescriptionChange = (newDescription: string) => {
-    if (journeyId) {
-      updateJourney({
-        id: journeyId,
-        updates: { description: newDescription },
-      });
-    }
-  };
+  const debouncedUpdateJourney = useCallback(
+    (newDescription: string) => {
+      if (journeyId) {
+        updateJourney({
+          id: journeyId,
+          updates: { description: newDescription },
+        });
+      }
+    },
+    [journeyId, updateJourney]
+  );
+
+  const handleDescriptionChange = useDebounce(debouncedUpdateJourney, 3000);
 
   return (
     <div className="bg-neutral-100 pt-4 grow h-10 px-4 pb-24 overflow-x-scroll flex flex-row gap-4 justify-center">
