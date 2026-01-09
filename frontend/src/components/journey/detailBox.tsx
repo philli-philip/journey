@@ -1,5 +1,5 @@
 import type { UserJourney } from "@shared/types";
-import { KeyValue, KeyValueDivider, KeyValueList } from "../ui/key-value";
+import { KeyValue, KeyValueAccordion, KeyValueList } from "../ui/key-value";
 import { formatDate } from "@/lib/formats";
 import {
   DropdownMenu,
@@ -13,16 +13,18 @@ import { useAllPersonaQuery } from "@/hooks/usePersona";
 import useJourney from "@/hooks/useJourney";
 
 export default function DetailBox({ journey }: { journey: UserJourney }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="bg-card rounded-md shadow-sm w-80">
-      <KeyValueList className="py-4" width={120}>
+    <>
+      <KeyValueList className="gap-2" width={120} open={open}>
         <KeyValue
           label="Personas"
+          className="h-4"
+          permanent
           value={
             <PersonaEdit journeyId={journey.id} personas={journey.personas} />
           }
         />
-        <KeyValueDivider />
         <KeyValue
           label="Updated"
           value={formatDate(new Date(journey.updatedAt))}
@@ -32,7 +34,8 @@ export default function DetailBox({ journey }: { journey: UserJourney }) {
           value={formatDate(new Date(journey.createdAt))}
         />
       </KeyValueList>
-    </div>
+      <KeyValueAccordion open={open} toggleFunction={() => setOpen(!open)} />
+    </>
   );
 }
 

@@ -15,6 +15,7 @@ import {
   PointerSensor,
   DndContext,
   type DragStartEvent,
+  type DragEndEvent,
 } from "@dnd-kit/core";
 import StepComponent from "@/components/journey/Step";
 import { GlobalCollapseProvider } from "@/components/journey/GlobalCollapseContext";
@@ -39,10 +40,10 @@ export default function JourneyView() {
     })
   );
 
-  function handleDragEnd(event: any) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       setSteps((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
