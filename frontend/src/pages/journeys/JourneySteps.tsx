@@ -3,7 +3,19 @@ import { useParams } from "react-router-dom";
 import useJourney from "@/hooks/useJourney";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { Reorder } from "framer-motion";
+import {
+  horizontalListSortingStrategy,
+  SortableContext,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import {
+  useSensors,
+  closestCenter,
+  useSensor,
+  PointerSensor,
+  DndContext,
+  type DragStartEvent,
+} from "@dnd-kit/core";
 import StepComponent from "@/components/journey/Step";
 import { GlobalCollapseProvider } from "@/components/journey/GlobalCollapseContext";
 import { LayerPanel } from "@/components/journey/GlobalCollapsePanel";
@@ -18,6 +30,34 @@ export default function JourneyView() {
     useJourney(journeyId as string);
   const [steps, setSteps] = useState<Step[]>(journey?.steps || []);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  function handleDragEnd(event: any) {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setSteps((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+
+        updateJourney({
+          id: journey!.id,
+          updates: { orderedStepIds: newOrder.map((step) => step.id) },
+        });
+
+        return newOrder;
+      });
+    }
+    setActiveId(null);
+  }
 
   useEffect(() => {
     async function setStepsFunction(newSteps: Step[]) {
@@ -52,57 +92,55 @@ export default function JourneyView() {
       >
         <GlobalCollapseProvider>
           <LayerPanel />
-          <Reorder.Group
-            axis="x"
-            values={steps}
-            onReorder={(newOrder) => {
-              setSteps(newOrder);
-              updateJourney({
-                id: journey.id,
-                updates: { orderedStepIds: newOrder.map((step) => step.id) },
-              });
-            }}
-            className="flex gap-1 h-fit flex-row items-stretch overflow-x-scroll flex-1 overflow-y-hidden pb-4"
-            data-slot="journey-steps"
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={(event: DragStartEvent) =>
+              setActiveId(event.active.id as string)
+            }
+            onDragEnd={handleDragEnd}
           >
-            {steps.length === 0 ? (
-              <Empty className="flex-1">
-                <EmptyTitle>No steps yet. Add your first step!</EmptyTitle>
-                <Button
-                  variant="default"
-                  size="lg"
-                  onClick={() => addStep(journeyId)}
-                >
-                  <PlusIcon size="16" className="mr-2" />
-                  Add Step
-                </Button>
-              </Empty>
-            ) : (
-              <>
-                {steps.map((step, index) => (
-                  <Reorder.Item
-                    key={step.id}
-                    value={step}
-                    onDragStart={() => setActiveId(step.id)}
-                    onDragEnd={() => setActiveId(null)}
-                    className="flex-1"
-                  >
-                    <StepComponent
-                      step={step}
-                      index={index}
-                      isDragging={activeId === step.id}
-                      onDeleteStep={() =>
-                        deleteStep({
-                          stepId: step.id,
-                        })
-                      }
-                      journeyId={journeyId}
-                    />
-                  </Reorder.Item>
-                ))}
-              </>
-            )}
-          </Reorder.Group>
+            <SortableContext
+              items={steps}
+              strategy={horizontalListSortingStrategy}
+            >
+              <div
+                className="flex gap-1 h-fit flex-row items-stretch overflow-x-scroll flex-1 overflow-y-hidden pb-4"
+                data-slot="journey-steps"
+              >
+                {steps.length === 0 ? (
+                  <Empty className="flex-1">
+                    <EmptyTitle>No steps yet. Add your first step!</EmptyTitle>
+                    <Button
+                      variant="default"
+                      size="lg"
+                      onClick={() => addStep(journeyId)}
+                    >
+                      <PlusIcon size="16" className="mr-2" />
+                      Add Step
+                    </Button>
+                  </Empty>
+                ) : (
+                  <>
+                    {steps.map((step, index) => (
+                      <StepComponent
+                        key={step.id}
+                        step={step}
+                        index={index}
+                        isDragging={activeId === step.id}
+                        onDeleteStep={() =>
+                          deleteStep({
+                            stepId: step.id,
+                          })
+                        }
+                        journeyId={journeyId}
+                      />
+                    ))}
+                  </>
+                )}
+              </div>
+            </SortableContext>
+          </DndContext>
           <div className="px-2 py-1.5 shrink-0">
             <Button
               variant="outline"

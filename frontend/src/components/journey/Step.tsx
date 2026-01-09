@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import type { Step } from "@shared/types";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,10 @@ export default function StepComponent({
   onDeleteStep,
   isDragging,
 }: StepProps) {
-  const { attributes, listeners, setNodeRef } = useSortable({ id: step.id });
+  const { attributes, listeners, transform, transition, setNodeRef } =
+    useSortable({
+      id: step.id,
+    });
   const { globalCollapsedState } = useGlobalCollapse();
   const queryClient = useQueryClient();
   const [name, setName] = useState(step.name || "Step without name");
@@ -63,25 +67,31 @@ export default function StepComponent({
   const isImageCollapsed = globalCollapsedState.image;
   const isNeedsCollapsed = globalCollapsedState.needs;
 
+  const style = {
+    transition,
+    transform: CSS.Translate.toString(transform),
+  };
+
   return (
     <div
+      style={style}
       ref={setNodeRef}
       className={cn(
         "bg-card rounded shadow-sm divide-y min-w-72 flex flex-col",
-        isDragging && "shadow-2xl"
+        isDragging && "shadow-2xl z-100"
       )}
     >
       {/* Drag handle and title with action menu */}
       <div className="flex flex-row items-center justify-between h-12 px-2 gap-2">
         <GripVerticalIcon
-          size={16}
-          className="text-muted-foreground cursor-move"
+          size="16"
+          className="text-muted-foreground cursor-move shrink-0"
           {...attributes}
           {...listeners}
         />
         <input
           type="text"
-          className="text-foreground font-semibold truncate flex-1 bg-transparent focus:outline-none"
+          className="text-foreground w-10 font-semibold truncate flex-1 bg-transparent focus:outline-none"
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={(e) => stepMutation.mutate({ name: e.target.value })}
