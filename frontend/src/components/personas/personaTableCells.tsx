@@ -31,9 +31,9 @@ export const ActionCell = ({ row }: { row: Row<Persona> }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
-          onClick={(e) => {
-            e.preventDefault();
-            deletePersona(persona.slug);
+          onClick={async (e) => {
+            e.stopPropagation();
+            await deletePersona(persona.slug);
             queryClient.invalidateQueries({
               queryKey: ["personas"],
             });

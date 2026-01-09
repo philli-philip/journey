@@ -1,4 +1,7 @@
-import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 import type { UserJourney } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Row } from "@tanstack/react-table";
@@ -11,7 +14,7 @@ export const ActionCell = ({ row }: { row: Row<UserJourney> }) => {
   const journey = row.original;
   const queryClient = useQueryClient();
   return (
-    <DropdownMenu>
+    <DropdownMenu modal>
       <DropdownMenuTrigger className="z-10">
         <Button
           variant="ghost"
@@ -28,7 +31,7 @@ export const ActionCell = ({ row }: { row: Row<UserJourney> }) => {
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={(e) => {
-            e.preventDefault();
+            e.stopPropagation();
             deleteJourney(journey.id);
             queryClient.invalidateQueries({
               queryKey: ["journeys"],
